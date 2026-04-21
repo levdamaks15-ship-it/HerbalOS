@@ -18,7 +18,8 @@ export async function createLogAction(
   type: "weight" | "food" | "water" | "workout", 
   value: string, 
   note?: string,
-  expertSlug?: string
+  expertSlug?: string,
+  photo?: string
 ) {
   try {
     const log = await databases.createDocument(
@@ -30,7 +31,8 @@ export async function createLogAction(
         type,
         value,
         note,
-        expert_slug: expertSlug
+        photo,
+        expert: expertSlug
       }
     );
 

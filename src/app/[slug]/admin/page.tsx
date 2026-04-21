@@ -62,7 +62,7 @@ export default function AdminPage() {
        progress: -7.5,
        status: "active",
        lastActive: "2ч назад",
-       expert_slug: "vadim"
+       expert: slug as string
     },
     {
        $id: "cl-2",
@@ -73,7 +73,7 @@ export default function AdminPage() {
        progress: -0.2,
        status: "at_risk",
        lastActive: "2 дня назад",
-       expert_slug: "vadim"
+       expert: slug as string
     },
     {
        $id: "cl-3",
@@ -84,7 +84,7 @@ export default function AdminPage() {
        progress: 4.4,
        status: "active",
        lastActive: "15м назад",
-       expert_slug: "vadim"
+       expert: slug as string
     },
     {
        $id: "cl-4",
@@ -95,7 +95,7 @@ export default function AdminPage() {
        progress: -0.2,
        status: "at_risk",
        lastActive: "3 дня назад",
-       expert_slug: "vadim"
+       expert: slug as string
     },
     {
        $id: "cl-5",
@@ -106,7 +106,7 @@ export default function AdminPage() {
        progress: -5.9,
        status: "active",
        lastActive: "1ч назад",
-       expert_slug: "vadim"
+       expert: slug as string
     }
   ], []);
 

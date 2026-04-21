@@ -19,7 +19,7 @@ export interface DB_Post {
   imageAfter?: string;
   stats_weight?: string;
   stats_waist?: string;
-  expert_slug: string;
+  expert: string;
   status: "published" | "pending";
   client_id?: string;
   products?: string[];
@@ -28,7 +28,7 @@ export interface DB_Post {
 export async function getPosts(expertSlug: string, includePending = false) {
   try {
     const queries = [
-      Query.equal("expert_slug", expertSlug),
+      Query.equal("expert", expertSlug),
       Query.orderDesc("$createdAt")
     ];
 
@@ -72,7 +72,7 @@ export async function submitStoryAction(data: Omit<DB_Post, "$id" | "likes" | "c
       title: data.title,
       stats_weight: data.stats_weight,
       stats_waist: data.stats_waist
-    }, data.expert_slug);
+    }, data.expert);
 
     return response as unknown as DB_Post;
   } catch (error) {

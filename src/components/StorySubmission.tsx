@@ -66,7 +66,7 @@ export function StorySubmission({ isOpen, onClose, expertSlug, clientId }: Story
         imageAfter: urlAfter,
         stats_weight: statsWeight,
         stats_waist: statsWaist,
-        expert_slug: expertSlug,
+        expert: expertSlug,
         client_id: clientId,
         category: "Результаты",
         type: "result",

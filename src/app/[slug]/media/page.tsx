@@ -29,7 +29,7 @@ const FALLBACK_POSTS: Partial<DB_Post>[] = [
     isPremium: true,
     author: "Expert",
     comments: 12,
-    expert_slug: "vadim",
+    expert: "vadim",
     status: "published"
   },
   {
@@ -46,7 +46,7 @@ const FALLBACK_POSTS: Partial<DB_Post>[] = [
     likes: 450,
     author: "Expert",
     comments: 48,
-    expert_slug: "vadim",
+    expert: "vadim",
     status: "published",
     products: ["Коктейль Ф1", "Алоэ", "Травяной напиток"]
   }

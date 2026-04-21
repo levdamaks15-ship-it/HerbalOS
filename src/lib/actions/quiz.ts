@@ -25,7 +25,7 @@ export async function onQuizCompleteAction(formData: QuizResults, slug: string) 
       ID.unique(),
       {
         name: formData.name,
-        expert_slug: slug,
+        expert: slug,
         status: "inactive", 
         goal: formData.goal,
         weight_start: parseFloat(formData.weight),

@@ -11,7 +11,7 @@ export interface DB_Client {
   weight_current: number;
   goal: string;
   photo_url?: string;
-  expert_slug: string;
+  expert: string;
   telegram_chat_id?: string;
 }
 
@@ -21,7 +21,7 @@ export async function getClients(expertSlug: string) {
       APPWRITE_CONFIG.databaseId,
       APPWRITE_CONFIG.collections.clients,
       [
-        Query.equal("expert_slug", expertSlug),
+        Query.equal("expert", expertSlug),
         Query.orderDesc("$updatedAt")
       ]
     );
