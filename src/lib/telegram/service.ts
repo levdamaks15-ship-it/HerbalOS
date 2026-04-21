@@ -80,6 +80,34 @@ export const telegramService = {
     }
   },
 
+  // Уведомление об активности (вес/еда)
+  async sendActivityNotification(clientName: string, type: string, value: string, expertSlug: string) {
+    if (!bot) return;
+    const chatId = process.env.TELEGRAM_LEADS_CHAT_ID;
+    if (!chatId) return;
+
+    const activity = type === 'weight' ? '⚖️ Замер веса' : '🍽 Дневник питания';
+    const detail = type === 'weight' ? `${value} кг` : value;
+
+    const message = `
+📊 *АКТИВНОСТЬ КЛИЕНТА*
+--------------------------------
+👤 *Клиент:* ${clientName}
+🏃‍♂️ *Действие:* ${activity}
+📝 *Данные:* ${detail}
+
+🔗 [Открыть CRM](https://herbalife-os.vercel.app/${expertSlug}/admin)
+--------------------------------
+#activity #client_log
+`;
+
+    try {
+      await bot.api.sendMessage(chatId, message, { parse_mode: "Markdown" });
+    } catch (error) {
+      console.error("Error sending activity notification:", error);
+    }
+  },
+
   // Прямое напоминание клиенту («Огоньки»)
   async sendPersonalReminder(chatId: string, message: string) {
     if (!bot || !chatId) return;
