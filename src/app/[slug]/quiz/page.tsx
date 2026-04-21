@@ -48,8 +48,10 @@ function QuizContent() {
     const finalName = quizData?.name || name || "Не указано";
 
     await onQuizCompleteAction({
-      ...quizData,
       name: finalName,
+      weight: quizData?.weight || "0",
+      height: quizData?.height || "0",
+      goal: quizData?.goal || "Не указана",
       bmi,
       water,
       scheduledTime: `${date}, ${time}`
