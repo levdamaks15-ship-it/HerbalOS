@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herbalife OS | Control Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7BC143;
+            --primary-dark: #5ea32d;
+            --bg: #FDFCFB;
+            --graphite: #1A1A1A;
+            --glass: rgba(255, 255, 255, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(123, 193, 67, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(123, 193, 67, 0.05) 0%, transparent 40%);
+            min-height: 100-vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: var(--graphite);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            font-style: italic;
+            letter-spacing: -2px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: rgba(0,0,0,0.2);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            width: 100%;
+            animation: fadeInUp 1s ease 0.2s backwards;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(123, 193, 67, 0.1);
+            background: white;
+            border-color: var(--primary);
+        }
+
+        .card .icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 10px 20px rgba(123, 193, 67, 0.3);
+        }
+
+        .card.alt .icon {
+            background: var(--graphite);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: rgba(0,0,0,0.4);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .url {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(123, 193, 67, 0.1);
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .footer {
+            margin-top: 80px;
+            text-align: center;
+            color: rgba(0,0,0,0.15);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #2ecc71;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #2ecc71;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>HERBAL OS</h1>
+        <p>Ecosystem Control Panel</p>
+        <div class="status">
+            <div class="status-dot"></div>
+            SYSTEM OPERATIONAL
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- Expert Hub -->
+        <a href="http://localhost:3000/vadim" target="_blank" class="card">
+            <div class="badge">Public</div>
+            <div class="icon">📰</div>
+            <h3>Expert Media Hub</h3>
+            <p>Публичное лицо эксперта. Профессиональная лента контента, статьи, кейсы «До/После» и база знаний.</p>
+            <div class="url">open: /vadim ➔</div>
+        </a>
+
+        <!-- CRM Admin -->
+        <a href="http://localhost:3000/vadim/admin" target="_blank" class="card alt">
+            <div class="badge">Security</div>
+            <div class="icon">📊</div>
+            <h3>Admin CRM Terminal</h3>
+            <p>Центр управления бизнесом. Мониторинг группы риска, аналитика клиентов и издательство постов.</p>
+            <div class="url">open: /admin ➔</div>
+        </a>
+
+        <!-- Quiz Funnel -->
+        <a href="http://localhost:3000/vadim/quiz" target="_blank" class="card">
+            <div class="badge">Marketing</div>
+            <div class="icon">🎯</div>
+            <h3>Smart Quiz Funnel</h3>
+            <p>Автоматизированная воронка сбора заявок. Расчет ИМТ и запись на консультацию.</p>
+            <div class="url">open: /quiz ➔</div>
+        </a>
+
+        <!-- Client Dashboard -->
+        <a href="http://localhost:3000/vadim/dashboard" target="_blank" class="card">
+            <div class="badge">App</div>
+            <div class="icon">📲</div>
+            <h3>Client Experience</h3>
+            <p>Личный кабинет участника (TWA). Огоньки привычек, логи веса, питания и настройки уведомлений.</p>
+            <div class="url">open: /dashboard ➔</div>
+        </a>
+
+        <!-- Telegram Bot -->
+        <a href="https://t.me/hnexpert_bot" target="_blank" class="card alt">
+            <div class="badge">Social</div>
+            <div class="icon">🤖</div>
+            <h3>Telegram Bot Logic</h3>
+            <p>Интерфейс связи и уведомлений. Мгновенная доставка лидов и напоминания участникам.</p>
+            <div class="url">open: @hnexpert_bot ➔</div>
+        </a>
+    </div>
+
+    <div class="footer">
+        Professional Nutrition Ecosystem • 2024
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #7BC143;
+  --color-primary-dark: #387C2B;
+  --color-graphite: #262324;
+  --color-accent-bg: #F9F8F4;
+  
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  --radius-4xl: 2.5rem;
+
+  --shadow-health: 0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+  --shadow-premium: 0 20px 40px -10px rgba(123, 193, 67, 0.15);
+
+  --breakpoint-xs: 380px;
+}
+
+:root {
+  --background: #FDFCFB;
+  --foreground: #1A1A1A;
+  --card: #FFFFFF;
+  --primary: #7BC143;
+  --primary-glow: rgba(123, 193, 67, 0.3);
+  --font-outfit: 'Outfit', sans-serif;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .font-outfit {
+    font-family: var(--font-outfit);
+  }
+
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-2xl border border-white/50 shadow-xl;
+  }
+
+  .gradient-border {
+    position: relative;
+    background: linear-gradient(var(--card), var(--card)) padding-box,
+                linear-gradient(to right, #7BC143, #A3D977) border-box;
+    border: 2px solid transparent;
+  }
+
+  .health-card {
+    background-color: var(--card);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-health);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .health-card:hover {
+    box-shadow: var(--shadow-premium);
+    transform: translateY(-4px);
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white font-bold py-3 px-6 rounded-2xl transition-all active:scale-95 hover:bg-primary-dark shadow-lg shadow-primary/20 flex items-center justify-center gap-2;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse-subtle 2s infinite;
+  }
+}
+
+@keyframes pulse-subtle {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+input:focus, button:focus {
+  outline: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

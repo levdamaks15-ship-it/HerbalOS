@@ -1,0 +1,51 @@
+import { databases, APPWRITE_CONFIG } from "@/lib/appwrite/config";
+import { Query } from "appwrite";
+
+export interface DB_Client {
+  $id: string;
+  name: string;
+  status: "active" | "at_risk" | "inactive";
+  progress: number;
+  lastActive: string;
+  weight_start: number;
+  weight_current: number;
+  goal: string;
+  photo_url?: string;
+  expert_slug: string;
+  telegram_chat_id?: string;
+}
+
+export async function getClients(expertSlug: string) {
+  try {
+    const response = await databases.listDocuments(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.collections.clients,
+      [
+        Query.equal("expert_slug", expertSlug),
+        Query.orderDesc("$updatedAt")
+      ]
+    );
+
+    return response.documents as unknown as DB_Client[];
+  } catch (error) {
+    console.error("Error fetching clients:", error);
+    return [];
+  }
+}
+
+export async function updateClientAction(clientId: string, data: Partial<DB_Client>) {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { $id, ...updateData } = data;
+    const response = await databases.updateDocument(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.collections.clients,
+      clientId,
+      updateData
+    );
+    return { success: true, data: response };
+  } catch (error) {
+    console.error("Error updating client:", error);
+    return { success: false, error };
+  }
+}
