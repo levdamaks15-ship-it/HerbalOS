@@ -18,7 +18,9 @@ import {
   LayoutDashboard,
   Sparkles,
   Trophy as TrophyIcon,
-  User
+  User,
+  Home,
+  LogOut
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,6 +29,7 @@ import { getClientLogs, createLogAction, DB_Log } from "@/lib/actions/logs";
 import { getCurrentClientAction, DB_Client } from "@/lib/actions/clients";
 import { useParams, useRouter } from "next/navigation";
 import { useTWA } from "@/components/TWAProvider";
+import { AuthProvider, useAuth } from "@/components/AuthProvider";
 import { LogModal } from "@/components/LogModal";
 import { StorySubmission } from "@/components/StorySubmission";
 import Link from "next/link";
@@ -160,6 +163,30 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen pb-44 bg-[#FDFCFB] font-outfit">
+      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-graphite/5 px-4 h-16 flex items-center justify-between">
+        <Link href={`/${slug}`} className="w-10 h-10 flex items-center justify-center rounded-xl bg-graphite/5 text-graphite/40 hover:text-primary transition-colors">
+          <Home size={20} />
+        </Link>
+        
+        <div className="flex items-center gap-2">
+           <button 
+              onClick={() => setActiveView("settings")}
+              className={cn(
+                "w-10 h-10 flex items-center justify-center rounded-xl transition-all",
+                activeView === "settings" ? "bg-primary text-white" : "bg-graphite/5 text-graphite/40"
+              )}
+            >
+              <Settings size={20} />
+            </button>
+            <button 
+              onClick={logout}
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
+            >
+              <LogOut size={20} />
+            </button>
+        </div>
+      </div>
+
       <LogModal 
         isOpen={!!modalType}
         type={modalType || "weight"}
@@ -172,7 +199,7 @@ export default function DashboardPage() {
         isOpen={isStoryOpen}
         onClose={() => setIsStoryOpen(false)}
         expertSlug={slug as string}
-        clientId={String(user?.id || "demo")}
+        clientId={String(twaUser?.id || "demo")}
       />
 
       <AnimatePresence mode="wait">
@@ -215,15 +242,15 @@ export default function DashboardPage() {
             <div className="p-8 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-3xl bg-primary/20 flex items-center justify-center overflow-hidden border-4 border-white shadow-xl">
-                   {user?.photo_url ? (
-                     <img src={user.photo_url} alt="Profile" className="w-full h-full object-cover" />
+                   {clientData?.photo_url || twaUser?.photo_url ? (
+                     <img src={clientData?.photo_url || twaUser?.photo_url} alt="Profile" className="w-full h-full object-cover" />
                    ) : (
                      <LayoutDashboard size={28} className="text-primary" />
                    )}
                 </div>
                 <div>
                   <div className="text-[10px] font-black text-graphite/30 uppercase mb-0.5">Личный кабинет</div>
-                  <div className="text-xl font-black">{clientData?.name || user?.first_name || "Участник"}</div>
+                  <div className="text-xl font-black">{clientData?.name || twaUser?.first_name || "Участник"}</div>
                 </div>
               </div>
               
