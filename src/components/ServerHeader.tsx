@@ -6,9 +6,18 @@ import { Button } from "@/components/ui/button";
 import { User, LayoutDashboard, LogOut, Home } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 
-export async function ServerHeader({ slug }: { slug: string }) {
-  const user = await getCurrentUserAction();
-  const clientProfile = user ? await getCurrentClientAction() : null;
+export async function ServerHeader({ 
+  slug, 
+  initialUser, 
+  initialProfile 
+}: { 
+  slug: string;
+  initialUser?: any;
+  initialProfile?: any;
+}) {
+  // Используем переданные данные или получаем их сами (для гибкости)
+  const user = initialUser !== undefined ? initialUser : await getCurrentUserAction();
+  const clientProfile = initialProfile !== undefined ? initialProfile : (user ? await getCurrentClientAction() : null);
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-graphite/5 px-4 h-16 flex items-center justify-between gap-2">
