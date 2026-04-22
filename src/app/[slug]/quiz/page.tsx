@@ -49,9 +49,9 @@ function QuizContent() {
     const finalName = quizData?.name || name || "Не указано";
     const email = quizData?.email || `${finalName.toLowerCase().replace(/\s+/g, '')}${Date.now()}@herbal.os`;
 
-    await onQuizCompleteAction({
+    const result = await onQuizCompleteAction({
       name: finalName,
-      email: email, // Нам нужен email для создания аккаунта
+      email: email,
       weight: quizData?.weight || "0",
       height: quizData?.height || "0",
       goal: quizData?.goal || "Не указана",
@@ -61,10 +61,22 @@ function QuizContent() {
       password: password
     }, slug as string);
 
-    const message = `Здравствуйте! Я записался на разбор: ${date}, ${time}. Мои данные: Имя: ${finalName}, Вес ${w}кг, Рост ${quizData?.height}см, ИМТ ${bmi}. Цель: ${quizData?.goal}.`;
-    const encodedMessage = encodeURIComponent(message);
-    
-    window.location.href = `https://t.me/hnexpert_bot?text=${encodedMessage}`;
+    if (result.success && password) {
+      try {
+        // Автоматически логиним клиента под его новым паролем
+        const { authService } = await import("@/lib/appwrite/services/auth");
+        await authService.login(email, password);
+        
+        // Редирект в личный кабинет
+        window.location.href = `/${slug}/dashboard`;
+      } catch (err) {
+        console.error("Auto-login failed:", err);
+        // Если вдруг авто-логин упал, просто ведем на страницу логина
+        window.location.href = `/${slug}/login`;
+      }
+    } else {
+      window.location.href = `/${slug}/login`;
+    }
   };
 
   return (
