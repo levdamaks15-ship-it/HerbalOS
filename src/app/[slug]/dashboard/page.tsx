@@ -223,7 +223,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <div className="text-[10px] font-black text-graphite/30 uppercase mb-0.5">Личный кабинет</div>
-                  <div className="text-xl font-black">{user?.first_name || "Участник"}</div>
+                  <div className="text-xl font-black">{clientData?.name || user?.first_name || "Участник"}</div>
                 </div>
               </div>
               

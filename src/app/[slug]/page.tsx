@@ -49,6 +49,13 @@ export default function ExpertPortalPage() {
                       </Link>
                     </Button>
 
+                    {/* Кнопка админки видна ТОЛЬКО если это НЕ клиент (т.е. эксперт) */}
+                    {!clientProfile && (
+                      <Button asChild variant="ghost" className="rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase h-10 px-3 bg-graphite/5">
+                        <Link href={`/${slug}/admin`}>Админка</Link>
+                      </Button>
+                    )}
+
                     <Button onClick={logout} variant="ghost" size="icon" className="rounded-xl bg-red-50 text-red-500 hover:bg-red-100 h-10 w-10">
                        <LogOut size={18} />
                     </Button>
