@@ -40,21 +40,24 @@ function QuizContent() {
     setCompleted(true);
   };
 
-  const handleScheduleConfirm = async (date: string, time: string) => {
+  const handleScheduleConfirm = async (date: string, time: string, password?: string) => {
     const w = parseFloat(quizData?.weight || "0");
     const h = parseFloat(quizData?.height || "1") / 100;
     const bmi = (w / (h * h)).toFixed(1);
     const water = (w * 0.03).toFixed(1);
     const finalName = quizData?.name || name || "Не указано";
+    const email = quizData?.email || `${finalName.toLowerCase().replace(/\s+/g, '')}${Date.now()}@herbal.os`;
 
     await onQuizCompleteAction({
       name: finalName,
+      email: email, // Нам нужен email для создания аккаунта
       weight: quizData?.weight || "0",
       height: quizData?.height || "0",
       goal: quizData?.goal || "Не указана",
       bmi,
       water,
-      scheduledTime: `${date}, ${time}`
+      scheduledTime: `${date}, ${time}`,
+      password: password
     }, slug as string);
 
     const message = `Здравствуйте! Я записался на разбор: ${date}, ${time}. Мои данные: Имя: ${finalName}, Вес ${w}кг, Рост ${quizData?.height}см, ИМТ ${bmi}. Цель: ${quizData?.goal}.`;

@@ -7,6 +7,8 @@ import { ID } from "node-appwrite";
 
 interface QuizResults {
   name: string;
+  email?: string;
+  password?: string;
   weight: string;
   height: string;
   goal: string;
@@ -19,9 +21,28 @@ export async function onQuizCompleteAction(formData: QuizResults, slug: string) 
   console.log("Quiz completed on server for slug:", slug, formData);
   
   try {
-    const { databases } = await createAdminClient();
+    const { databases, users } = await createAdminClient();
+    let userId = null;
 
-    // Сохраняем как нового "клиента" со статусом inactive (лид)
+    // 1. Пытаемся создать аккаунт пользователя, если есть email и пароль
+    if (formData.email && formData.password) {
+      try {
+        const newUser = await users.create(
+          ID.unique(),
+          formData.email,
+          undefined, // phone
+          formData.password,
+          formData.name
+        );
+        userId = newUser.$id;
+        console.log("👤 Appwrite User created:", userId);
+      } catch (userError: any) {
+        console.error("⚠️ Failed to create user (might already exist):", userError.message);
+        // Если пользователь уже есть, мы всё равно сохраним анкету
+      }
+    }
+
+    // 2. Сохраняем анкету клиента и привязываем userId
     await databases.createDocument(
       APPWRITE_CONFIG.databaseId,
       APPWRITE_CONFIG.collections.clients,
@@ -34,13 +55,13 @@ export async function onQuizCompleteAction(formData: QuizResults, slug: string) 
         weight_start: parseFloat(formData.weight),
         weight_current: parseFloat(formData.weight),
         lastActive: "Пройден Wellness-тест",
-        progress: 0
+        progress: 0,
+        userId: userId // Привязываем аккаунт к анкете
       }
     );
-    console.log("✅ Quiz saved successfully to Appwrite");
+    console.log("✅ Quiz saved successfully to Appwrite with userId:", userId);
   } catch (error: any) {
     console.error("❌ Appwrite Error:", error.message);
-    console.error("Full Error Object:", JSON.stringify(error, null, 2));
     return { success: false, error: error.message };
   }
   

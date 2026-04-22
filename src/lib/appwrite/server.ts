@@ -1,4 +1,4 @@
-import { Client, Account, Databases, Storage } from "node-appwrite";
+import { Client, Account, Databases, Storage, Users } from "node-appwrite";
 
 export async function createSessionClient() {
   const { cookies } = await import("next/headers");
@@ -46,6 +46,9 @@ export async function createAdminClient() {
     },
     get storage() {
       return new Storage(client);
+    },
+    get users() {
+      return new Users(client);
     },
   };
 }

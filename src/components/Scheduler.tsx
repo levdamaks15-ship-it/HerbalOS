@@ -9,12 +9,13 @@ import { cn } from "@/lib/utils";
 
 type SchedulerProps = {
   expertName: string;
-  onConfirm: (date: string, time: string) => void;
+  onConfirm: (date: string, time: string, password?: string) => void;
 };
 
 export function Scheduler({ expertName, onConfirm }: SchedulerProps) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
   const [agreed, setAgreed] = useState(false);
 
   // Генерируем дефицит (от 2 до 5)
@@ -33,9 +34,9 @@ export function Scheduler({ expertName, onConfirm }: SchedulerProps) {
   const timeSlots = ["10:00", "11:30", "14:00", "16:30", "18:00", "19:30"];
 
   const handleConfirm = () => {
-    if (selectedDate && selectedTime && agreed) {
+    if (selectedDate && selectedTime && agreed && password.length >= 8) {
       const formattedDate = selectedDate.toLocaleDateString("ru-RU", { day: 'numeric', month: 'long' });
-      onConfirm(formattedDate, selectedTime);
+      onConfirm(formattedDate, selectedTime, password);
     }
   };
 
@@ -108,6 +109,35 @@ export function Scheduler({ expertName, onConfirm }: SchedulerProps) {
         </div>
       </motion.div>
 
+      {/* Выбор пароля */}
+      <motion.div 
+        animate={{ opacity: selectedTime ? 1 : 0.3 }}
+        className={cn(!selectedTime && "pointer-events-none")}
+      >
+        <div className="text-[10px] font-bold text-graphite/30 uppercase tracking-[0.2em] mb-4 px-2">3. Личный кабинет</div>
+        <div className="glass-card p-6 rounded-[32px] space-y-4 border-primary/10">
+          <div className="flex items-center gap-3 text-primary mb-2">
+            <Sparkles size={20} className="animate-pulse" />
+            <p className="text-sm font-black italic">Создайте свой ключ к переменам</p>
+          </div>
+          <p className="text-[11px] text-graphite/40 leading-relaxed">
+            Придумайте пароль (минимум 8 символов). Он станет вашим ключом к личному кабинету, где мы будем вместе следить за каждым вашим успехом.
+          </p>
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-graphite/20 group-focus-within:text-primary transition-colors">
+              <Lock size={18} />
+            </div>
+            <input 
+              type="password"
+              placeholder="Придумайте пароль"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full pl-12 pr-4 h-14 rounded-2xl bg-graphite/5 border-none focus:ring-2 focus:ring-primary/20 outline-none font-bold text-graphite placeholder:text-graphite/20 transition-all"
+            />
+          </div>
+        </div>
+      </motion.div>
+
       {/* Обязательства и Кнопка */}
       <Card className="border-none shadow-health bg-white overflow-hidden">
         <CardContent className="p-6 space-y-6">
@@ -127,10 +157,10 @@ export function Scheduler({ expertName, onConfirm }: SchedulerProps) {
 
           <Button 
             className="w-full h-16 text-lg shadow-xl shadow-primary/20"
-            disabled={!selectedDate || !selectedTime || !agreed}
+            disabled={!selectedDate || !selectedTime || !agreed || password.length < 8}
             onClick={handleConfirm}
           >
-            Подтвердить запись <MessageCircle className="ml-2" />
+            Подтвердить и создать кабинет <MessageCircle className="ml-2" />
           </Button>
         </CardContent>
       </Card>
