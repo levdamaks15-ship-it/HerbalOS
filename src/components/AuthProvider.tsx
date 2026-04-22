@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { authService } from "@/lib/appwrite/services/auth";
 import { getCurrentClientAction, DB_Client } from "@/lib/actions/clients";
+import { usePathname } from "next/navigation";
 
 interface AuthContextType {
   user: any | null; // Пользователь из Appwrite Auth
@@ -48,9 +49,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const pathname = usePathname();
+
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [pathname]);
 
   const logout = async () => {
     try {

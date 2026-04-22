@@ -15,18 +15,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useParams, useRouter } from "next/navigation";
 import { authService } from "@/lib/appwrite/services/auth";
+import { useAuth } from "@/components/AuthProvider";
 import Link from "next/link";
+import { loginAction, logoutAction } from "@/lib/actions/auth";
 
 export default function ClientLoginPage() {
   const { slug } = useParams();
   const router = useRouter();
+  const { refresh } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-
-  // Убрали автоматический редирект, чтобы избежать бесконечных циклов
-  // если залогинен Эксперт или пользователь без анкеты.
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,13 +35,11 @@ export default function ClientLoginPage() {
 
     try {
       // Сначала принудительно выходим через серверный экшен
-      const { loginAction, logoutAction } = await import("@/lib/actions/auth");
       await logoutAction();
 
       const result = await loginAction(email, password);
       
       if (result.success) {
-        // Даем время кукам прописаться и редиректим
         window.location.href = `/${slug}/dashboard`;
       } else {
         setError(result.error || "Неверный email или пароль.");
