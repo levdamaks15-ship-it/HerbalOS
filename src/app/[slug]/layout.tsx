@@ -1,5 +1,6 @@
 import React from "react";
 import { ServerHeader } from "@/components/ServerHeader";
+import { HeaderWrapper } from "@/components/HeaderWrapper";
 import { getCurrentUserAction } from "@/lib/actions/auth";
 import { getCurrentClientAction } from "@/lib/actions/clients";
 
@@ -22,7 +23,9 @@ export default async function ExpertLayout({
   return (
     <div className="min-h-screen bg-[#FDFCFB]">
       {/* Передаем данные напрямую, чтобы шапка не гадала */}
-      <ServerHeader slug={slug} initialUser={user} initialProfile={clientProfile} />
+      <HeaderWrapper>
+        <ServerHeader slug={slug} initialUser={user} initialProfile={clientProfile} />
+      </HeaderWrapper>
       <main>
         {children}
       </main>
