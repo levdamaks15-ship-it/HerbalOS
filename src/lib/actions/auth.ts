@@ -6,9 +6,20 @@ import { cookies } from "next/headers";
 
 export async function getCurrentUserAction() {
   try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get("appwrite-session");
+    
+    console.log("DEBUG: getCurrentUserAction - session cookie exists:", !!session);
+    
+    if (!session?.value) return null;
+
     const { account } = await createSessionClient();
-    return await account.get();
-  } catch (error) {
+    const user = await account.get();
+    
+    console.log("DEBUG: getCurrentUserAction - user found:", user.name);
+    return user;
+  } catch (error: any) {
+    console.log("DEBUG: getCurrentUserAction - error:", error.message);
     return null;
   }
 }
@@ -24,8 +35,9 @@ export async function loginAction(email: string, pass: string) {
     (await cookies()).set("appwrite-session", session.secret, {
       path: "/",
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "lax",
       secure: true,
+      maxAge: 60 * 60 * 24 * 30, // 30 days
     });
 
     return { success: true };
