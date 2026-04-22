@@ -32,12 +32,13 @@ import {
   approvePostAction, 
   deletePostAction 
 } from "@/lib/actions/posts";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ClientDetail } from "@/components/ClientDetail";
 import { authService } from "@/lib/appwrite/services/auth";
 
 export default function AdminPage() {
   const { slug } = useParams();
+  const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -170,6 +171,7 @@ export default function AdminPage() {
   const handleLogout = async () => {
     await authService.logout();
     setIsAuthenticated(false);
+    router.push(`/${slug}`);
   };
 
   const riskClients = clients.filter(c => c.status === "at_risk");
@@ -213,6 +215,14 @@ export default function AdminPage() {
               <div className="flex items-center justify-center gap-2 text-[10px] font-black text-graphite/20 uppercase ">
                  <ShieldCheck size={12} /> Protected by Herbal OS
               </div>
+              <Button 
+                variant="ghost" 
+                type="button"
+                onClick={() => router.push(`/${slug}`)} 
+                className="w-full text-[10px] font-black uppercase text-graphite/30 hover:text-graphite/50 h-8"
+              >
+                Вернуться на главную
+              </Button>
            </Card>
         </motion.div>
       </main>
