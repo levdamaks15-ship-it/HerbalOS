@@ -47,18 +47,24 @@ export async function getCurrentClientAction() {
     const { account } = await createSessionClient();
     const user = await account.get();
 
+    if (!user) return null;
+
     const { databases } = await createAdminClient();
+    
+    // Пытаемся найти документ, где userId равен ID текущего пользователя
     const response = await databases.listDocuments(
       APPWRITE_CONFIG.databaseId,
       APPWRITE_CONFIG.collections.clients,
-      [Query.equal("userId", user.$id)]
+      [Query.equal("userId", [user.$id])] // Используем массив для надежности
     );
 
     if (response.documents.length > 0) {
       return JSON.parse(JSON.stringify(response.documents[0])) as DB_Client;
     }
+
     return null;
-  } catch (error) {
+  } catch (error: any) {
+    console.error("getCurrentClientAction Error:", error.message);
     return null;
   }
 }
