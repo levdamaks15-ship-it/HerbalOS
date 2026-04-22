@@ -25,63 +25,9 @@ export default function ExpertPortalPage() {
   const expertName = "Эксперт Гербалайф";
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] text-graphite overflow-x-hidden font-outfit selection:bg-primary/20">
+    <div className="min-h-screen text-graphite overflow-x-hidden font-outfit selection:bg-primary/20">
       <FloatingTelegram />
-      {/* Search/Header Sticky Bar */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-graphite/5 px-4 h-16 flex items-center justify-between gap-2">
-         <Link href={`/${slug}`} className="hover:opacity-70 transition-opacity">
-            <div className="text-xl sm:text-2xl font-black italic text-primary shrink-0">HOS</div>
-         </Link>
-         
-         <div className="flex items-center gap-1.5 sm:gap-2">
-            {!isLoading && (
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                {user ? (
-                  <>
-                    <div className="hidden xs:flex flex-col items-end mr-2 text-right">
-                       <span className="text-[9px] font-black text-primary uppercase">Вы вошли как</span>
-                       <span className="text-xs font-black text-graphite truncate max-w-[100px]">
-                         {clientProfile?.name || user.name || "Пользователь"}
-                       </span>
-                    </div>
-                    
-                    {clientProfile ? (
-                      /* ЛОГИКА ДЛЯ КЛИЕНТА */
-                      <Button asChild className="rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase h-10 px-3 sm:px-5 shadow-lg shadow-primary/20">
-                        <Link href={`/${slug}/dashboard`}>Мой дневник</Link>
-                      </Button>
-                    ) : (
-                      /* ЛОГИКА ДЛЯ ЭКСПЕРТА */
-                      <Button asChild className="rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase h-10 px-3 sm:px-5 shadow-lg shadow-primary/20">
-                        <Link href={`/${slug}/admin`}>Админ-панель</Link>
-                      </Button>
-                    )}
-
-                    <Button onClick={logout} variant="ghost" size="icon" className="rounded-xl bg-red-50 text-red-500 hover:bg-red-100 h-10 w-10">
-                       <LogOut size={18} />
-                    </Button>
-                  </>
-                ) : (
-                  /* ЛОГИКА ДЛЯ ГОСТЯ */
-                  <>
-                    <Button asChild variant="ghost" className="rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase gap-2 bg-graphite/5 hover:bg-graphite/10 px-3 h-10">
-                      <Link href={`/${slug}/dashboard`}>
-                        <User size={16} className="text-primary shrink-0" /> 
-                        <span className="hidden xs:inline-block">Мой дневник</span>
-                      </Link>
-                    </Button>
-                    <Button asChild className="rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase h-10 px-3 sm:px-5 shadow-lg shadow-primary/20 flex items-center gap-2">
-                      <Link href={`/${slug}/admin`}>
-                        <LayoutDashboard size={16} className="shrink-0" />
-                        <span className="hidden xs:inline-block">Наставник</span>
-                      </Link>
-                    </Button>
-                  </>
-                )}
-              </div>
-            )}
-         </div>
-      </header>
+      {/* Шапка теперь в layout.tsx */}
 
       <main className="max-w-3xl mx-auto pb-12">
         {/* Profile Card / Bio */}

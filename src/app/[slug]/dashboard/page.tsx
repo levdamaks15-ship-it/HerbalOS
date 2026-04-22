@@ -163,30 +163,8 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="min-h-screen pb-44 bg-[#FDFCFB] font-outfit">
-      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-graphite/5 px-4 h-16 flex items-center justify-between">
-        <Link href={`/${slug}`} className="w-10 h-10 flex items-center justify-center rounded-xl bg-graphite/5 text-graphite/40 hover:text-primary transition-colors">
-          <Home size={20} />
-        </Link>
-        
-        <div className="flex items-center gap-2">
-           <button 
-              onClick={() => setActiveView("settings")}
-              className={cn(
-                "w-10 h-10 flex items-center justify-center rounded-xl transition-all",
-                activeView === "settings" ? "bg-primary text-white" : "bg-graphite/5 text-graphite/40"
-              )}
-            >
-              <Settings size={20} />
-            </button>
-            <button 
-              onClick={logout}
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
-            >
-              <LogOut size={20} />
-            </button>
-        </div>
-      </div>
+    <div className="min-h-screen pb-24">
+      {/* Шапка теперь общая в layout.tsx */}
 
       <LogModal 
         isOpen={!!modalType}
