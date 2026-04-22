@@ -63,15 +63,14 @@ function QuizContent() {
 
     if (result.success && password) {
       try {
-        // Автоматически логиним клиента под его новым паролем
-        const { authService } = await import("@/lib/appwrite/services/auth");
-        await authService.login(email, password);
+        // Автоматически логиним клиента через Server Action (куки)
+        const { loginAction } = await import("@/lib/actions/auth");
+        await loginAction(email, password);
         
         // Редирект в личный кабинет
         window.location.href = `/${slug}/dashboard`;
       } catch (err) {
         console.error("Auto-login failed:", err);
-        // Если вдруг авто-логин упал, просто ведем на страницу логина
         window.location.href = `/${slug}/login`;
       }
     } else {

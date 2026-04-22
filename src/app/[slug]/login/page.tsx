@@ -34,15 +34,18 @@ export default function ClientLoginPage() {
     setError("");
 
     try {
-      // Сначала принудительно выходим из любой старой сессии
-      try {
-        await authService.logout();
-      } catch (e) {
-        // Если сессии не было - игнорируем ошибку
-      }
+      // Сначала принудительно выходим через серверный экшен
+      const { loginAction, logoutAction } = await import("@/lib/actions/auth");
+      await logoutAction();
 
-      await authService.login(email, password);
-      router.push(`/${slug}/dashboard`);
+      const result = await loginAction(email, password);
+      
+      if (result.success) {
+        // Даем время кукам прописаться и редиректим
+        window.location.href = `/${slug}/dashboard`;
+      } else {
+        setError(result.error || "Неверный email или пароль.");
+      }
     } catch (err: any) {
       console.error("Login error:", err);
       setError("Неверный email или пароль. Убедитесь, что вы уже прошли Wellness Quiz.");
