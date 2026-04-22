@@ -85,7 +85,8 @@ const DEMO_LOGS: DB_Log[] = [
 export default function DashboardPage() {
   const { slug } = useParams();
   const router = useRouter();
-  const { user } = useTWA();
+  const { user: twaUser } = useTWA();
+  const { logout } = useAuth();
   const [modalType, setModalType] = useState<"weight" | "food" | null>(null);
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [logs, setLogs] = useState<DB_Log[]>([]);
