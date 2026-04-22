@@ -28,7 +28,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = async () => {
     try {
       setIsLoading(true);
-      const currentUser = await authService.getCurrentUser();
+      const { getCurrentUserAction } = await import("@/lib/actions/auth");
+      const currentUser = await getCurrentUserAction();
       setUser(currentUser);
 
       if (currentUser) {

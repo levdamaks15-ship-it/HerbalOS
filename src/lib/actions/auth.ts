@@ -1,7 +1,17 @@
 "use server";
 
-import { createAdminClient } from "@/lib/appwrite/server";
+import { authService } from "@/lib/appwrite/services/auth";
+import { createSessionClient } from "@/lib/appwrite/server";
 import { cookies } from "next/headers";
+
+export async function getCurrentUserAction() {
+  try {
+    const { account } = await createSessionClient();
+    return await account.get();
+  } catch (error) {
+    return null;
+  }
+}
 
 export async function loginAction(email: string, pass: string) {
   try {
