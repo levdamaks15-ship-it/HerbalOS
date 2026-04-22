@@ -27,6 +27,7 @@ export const metadata: Metadata = {
 };
 
 import { TWAProvider } from "@/components/TWAProvider";
+import { AuthProvider } from "@/components/AuthProvider";
 
 export default function RootLayout({
   children,
@@ -41,9 +42,11 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-accent-bg text-graphite">
         <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
-        <TWAProvider>
-          {children}
-        </TWAProvider>
+        <AuthProvider>
+          <TWAProvider>
+            {children}
+          </TWAProvider>
+        </AuthProvider>
       </body>
     </html>
   );
