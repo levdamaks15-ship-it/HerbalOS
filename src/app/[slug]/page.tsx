@@ -35,32 +35,34 @@ export default function ExpertPortalPage() {
          
          <div className="flex items-center gap-1.5 sm:gap-2">
             {!isLoading && (
-              <>
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 {user ? (
-                  <div className="flex items-center gap-2">
-                    <div className="hidden xs:flex flex-col items-end mr-2">
+                  <>
+                    <div className="hidden xs:flex flex-col items-end mr-2 text-right">
                        <span className="text-[9px] font-black text-primary uppercase">Вы вошли как</span>
-                       <span className="text-xs font-black text-graphite">{clientProfile?.name || user.name || "Пользователь"}</span>
+                       <span className="text-xs font-black text-graphite truncate max-w-[100px]">
+                         {clientProfile?.name || user.name || "Пользователь"}
+                       </span>
                     </div>
                     
-                    <Button asChild className="rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase h-10 px-3 sm:px-5 shadow-lg shadow-primary/20">
-                      <Link href={clientProfile ? `/${slug}/dashboard` : `/${slug}/admin`}>
-                        {clientProfile ? "Мой дневник" : "Админ-панель"}
-                      </Link>
-                    </Button>
-
-                    {/* Кнопка админки видна ТОЛЬКО если это НЕ клиент (т.е. эксперт) */}
-                    {!clientProfile && (
-                      <Button asChild variant="ghost" className="rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase h-10 px-3 bg-graphite/5">
-                        <Link href={`/${slug}/admin`}>Админка</Link>
+                    {clientProfile ? (
+                      /* ЛОГИКА ДЛЯ КЛИЕНТА */
+                      <Button asChild className="rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase h-10 px-3 sm:px-5 shadow-lg shadow-primary/20">
+                        <Link href={`/${slug}/dashboard`}>Мой дневник</Link>
+                      </Button>
+                    ) : (
+                      /* ЛОГИКА ДЛЯ ЭКСПЕРТА */
+                      <Button asChild className="rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase h-10 px-3 sm:px-5 shadow-lg shadow-primary/20">
+                        <Link href={`/${slug}/admin`}>Админ-панель</Link>
                       </Button>
                     )}
 
                     <Button onClick={logout} variant="ghost" size="icon" className="rounded-xl bg-red-50 text-red-500 hover:bg-red-100 h-10 w-10">
                        <LogOut size={18} />
                     </Button>
-                  </div>
+                  </>
                 ) : (
+                  /* ЛОГИКА ДЛЯ ГОСТЯ */
                   <>
                     <Button asChild variant="ghost" className="rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase gap-2 bg-graphite/5 hover:bg-graphite/10 px-3 h-10">
                       <Link href={`/${slug}/dashboard`}>
@@ -76,7 +78,7 @@ export default function ExpertPortalPage() {
                     </Button>
                   </>
                 )}
-              </>
+              </div>
             )}
          </div>
       </header>

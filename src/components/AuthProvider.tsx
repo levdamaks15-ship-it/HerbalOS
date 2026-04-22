@@ -52,10 +52,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const logout = async () => {
-    await authService.logout();
-    setUser(null);
-    setClientProfile(null);
-    window.location.href = "/"; // Редирект на главную после выхода
+    try {
+      // 1. Очищаем куки на сервере
+      const { logoutAction } = await import("@/lib/actions/auth");
+      await logoutAction();
+      
+      // 2. Очищаем сессию в Appwrite (клиент)
+      await authService.logout();
+      
+      setUser(null);
+      setClientProfile(null);
+      
+      // 3. Жесткий редирект на главную страницу текущего эксперта
+      const slug = window.location.pathname.split('/')[1] || "";
+      window.location.href = slug ? `/${slug}` : "/";
+    } catch (error) {
+      console.error("Logout error:", error);
+      window.location.href = "/";
+    }
   };
 
   return (
