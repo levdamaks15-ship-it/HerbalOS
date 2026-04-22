@@ -492,7 +492,7 @@ export default function DashboardPage() {
           <span className="text-[10px] font-black uppercase">Настройки</span>
         </button>
       </div>
-    </main>
+    </div>
   );
 }
 
