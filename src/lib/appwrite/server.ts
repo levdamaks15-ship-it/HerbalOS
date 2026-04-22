@@ -24,16 +24,16 @@ export async function createSessionClient() {
 }
 
 export async function createAdminClient() {
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
+  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || 'https://cloud.appwrite.io/v1';
   const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
   const apiKey = process.env.APPWRITE_API_KEY;
 
-  if (!apiKey) {
-    console.error("❌ CRITICAL: APPWRITE_API_KEY is missing in environment variables!");
+  if (!apiKey || !projectId) {
+    console.error("❌ CRITICAL: Missing APPWRITE_API_KEY or PROJECT_ID in environment variables!");
   }
 
   const client = new Client()
-    .setEndpoint(endpoint!)
+    .setEndpoint(endpoint)
     .setProject(projectId!)
     .setKey(apiKey!);
 

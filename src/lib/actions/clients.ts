@@ -32,8 +32,12 @@ export async function getClients(expertSlug: string) {
 
     // Принудительная сериализация для Next.js Server Actions
     return JSON.parse(JSON.stringify(response.documents)) as DB_Client[];
-  } catch (error) {
-    console.error("Error fetching clients:", error);
+  } catch (error: any) {
+    console.error("❌ Error fetching clients from Appwrite:", error.message);
+    console.log("Details used:", { 
+      databaseId: APPWRITE_CONFIG.databaseId, 
+      collectionId: APPWRITE_CONFIG.collections.clients 
+    });
     return [];
   }
 }
