@@ -38,8 +38,8 @@ import { authService } from "@/lib/appwrite/services/auth";
 
 export default function AdminPage() {
   const { slug } = useParams();
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // Временно отключено
-  const [email, setEmail] = useState("admin@herbal.os");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"risk" | "all" | "content">("risk");
@@ -49,7 +49,13 @@ export default function AdminPage() {
   const [selectedClient, setSelectedClient] = useState<DB_Client | null>(null);
 
   useEffect(() => {
-    // Временно пропускаем проверку сессии для свободного входа
+    async function checkSession() {
+      const user = await authService.getCurrentUser();
+      if (user) {
+        setIsAuthenticated(true);
+      }
+    }
+    checkSession();
   }, []);
 
   const DEMO_CLIENTS: DB_Client[] = React.useMemo(() => [

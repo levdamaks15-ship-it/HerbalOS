@@ -1,5 +1,8 @@
-import { databases, APPWRITE_CONFIG } from "@/lib/appwrite/config";
-import { Query } from "appwrite";
+"use server";
+
+import { APPWRITE_CONFIG } from "@/lib/appwrite/config";
+import { createAdminClient } from "@/lib/appwrite/server";
+import { Query } from "node-appwrite";
 
 export interface DB_Client {
   $id: string;
@@ -17,6 +20,7 @@ export interface DB_Client {
 
 export async function getClients(expertSlug: string) {
   try {
+    const { databases } = await createAdminClient();
     const response = await databases.listDocuments(
       APPWRITE_CONFIG.databaseId,
       APPWRITE_CONFIG.collections.clients,
@@ -26,7 +30,8 @@ export async function getClients(expertSlug: string) {
       ]
     );
 
-    return response.documents as unknown as DB_Client[];
+    // Принудительная сериализация для Next.js Server Actions
+    return JSON.parse(JSON.stringify(response.documents)) as DB_Client[];
   } catch (error) {
     console.error("Error fetching clients:", error);
     return [];
@@ -35,6 +40,7 @@ export async function getClients(expertSlug: string) {
 
 export async function updateClientAction(clientId: string, data: Partial<DB_Client>) {
   try {
+    const { databases } = await createAdminClient();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { $id, ...updateData } = data;
     const response = await databases.updateDocument(

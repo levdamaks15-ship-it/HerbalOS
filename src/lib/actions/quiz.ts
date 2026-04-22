@@ -1,8 +1,9 @@
 "use server";
 
 import { telegramService } from "@/lib/telegram/service";
-import { databases, APPWRITE_CONFIG } from "@/lib/appwrite/config";
-import { ID } from "appwrite";
+import { createAdminClient } from "@/lib/appwrite/server";
+import { APPWRITE_CONFIG } from "@/lib/appwrite/config";
+import { ID } from "node-appwrite";
 
 interface QuizResults {
   name: string;
@@ -18,6 +19,8 @@ export async function onQuizCompleteAction(formData: QuizResults, slug: string) 
   console.log("Quiz completed on server for slug:", slug, formData);
   
   try {
+    const { databases } = await createAdminClient();
+
     // Сохраняем как нового "клиента" со статусом inactive (лид)
     await databases.createDocument(
       APPWRITE_CONFIG.databaseId,
@@ -34,8 +37,11 @@ export async function onQuizCompleteAction(formData: QuizResults, slug: string) 
         progress: 0
       }
     );
-  } catch (error) {
-    console.error("Failed to save quiz to DB:", error);
+    console.log("✅ Quiz saved successfully to Appwrite");
+  } catch (error: any) {
+    console.error("❌ Appwrite Error:", error.message);
+    console.error("Full Error Object:", JSON.stringify(error, null, 2));
+    return { success: false, error: error.message };
   }
   
   // Отправляем уведомление в Telegram

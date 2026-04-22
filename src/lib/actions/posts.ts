@@ -1,8 +1,9 @@
 "use server";
-
-import { databases, APPWRITE_CONFIG } from "@/lib/appwrite/config";
-import { Query } from "appwrite";
-
+ 
+import { APPWRITE_CONFIG } from "@/lib/appwrite/config";
+import { createAdminClient } from "@/lib/appwrite/server";
+import { Query } from "node-appwrite";
+ 
 export interface DB_Post {
   $id: string;
   category: string;
@@ -24,33 +25,35 @@ export interface DB_Post {
   client_id?: string;
   products?: string[];
 }
-
+ 
 export async function getPosts(expertSlug: string, includePending = false) {
   try {
+    const { databases } = await createAdminClient();
     const queries = [
       Query.equal("expert", expertSlug),
       Query.orderDesc("$createdAt")
     ];
-
+ 
     if (!includePending) {
       queries.push(Query.equal("status", "published"));
     }
-
+ 
     const response = await databases.listDocuments(
       APPWRITE_CONFIG.databaseId,
       APPWRITE_CONFIG.collections.timeline,
       queries
     );
-
-    return response.documents as unknown as DB_Post[];
+ 
+    return JSON.parse(JSON.stringify(response.documents)) as DB_Post[];
   } catch (error) {
     console.error("Error fetching posts:", error);
     return [];
   }
 }
-
+ 
 export async function submitStoryAction(data: Omit<DB_Post, "$id" | "likes" | "comments" | "date" | "status">) {
   try {
+    const { databases } = await createAdminClient();
     const response = await databases.createDocument(
       APPWRITE_CONFIG.databaseId,
       APPWRITE_CONFIG.collections.timeline,
@@ -64,7 +67,7 @@ export async function submitStoryAction(data: Omit<DB_Post, "$id" | "likes" | "c
         isPremium: false,
       }
     );
-
+ 
     // Уведомление эксперта о новой истории
     const { telegramService } = await import("@/lib/telegram/service");
     await telegramService.sendStoryModerationNotification({
@@ -73,20 +76,21 @@ export async function submitStoryAction(data: Omit<DB_Post, "$id" | "likes" | "c
       stats_weight: data.stats_weight,
       stats_waist: data.stats_waist
     }, data.expert);
-
+ 
     return response as unknown as DB_Post;
   } catch (error) {
     console.error("Error submitting story:", error);
     throw error;
   }
 }
-
+ 
 export async function approvePostAction(postId: string, data: Partial<DB_Post>) {
   try {
+    const { databases } = await createAdminClient();
     const updateData = Object.fromEntries(
       Object.entries(data).filter(([key]) => !key.startsWith('$') && !['likes', 'comments'].includes(key))
     );
-
+ 
     const response = await databases.updateDocument(
       APPWRITE_CONFIG.databaseId,
       APPWRITE_CONFIG.collections.timeline,
@@ -103,9 +107,10 @@ export async function approvePostAction(postId: string, data: Partial<DB_Post>) 
     throw error;
   }
 }
-
+ 
 export async function deletePostAction(postId: string) {
   try {
+    const { databases } = await createAdminClient();
     await databases.deleteDocument(
       APPWRITE_CONFIG.databaseId,
       APPWRITE_CONFIG.collections.timeline,

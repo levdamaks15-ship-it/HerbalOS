@@ -1,6 +1,7 @@
-import { databases, storage, APPWRITE_CONFIG } from '../config';
-import { ID, Query } from 'appwrite';
-
+import { APPWRITE_CONFIG } from '../config';
+import { createAdminClient } from '../server';
+import { ID, Query } from 'node-appwrite';
+ 
 export type LogEntry = {
   userId: string;
   type: 'weight' | 'food' | 'water';
@@ -9,11 +10,12 @@ export type LogEntry = {
   photoIds?: string[];
   timestamp: string;
 };
-
+ 
 export const logService = {
   // Создание новой записи в дневнике
   async createLog(data: LogEntry) {
     try {
+      const { databases } = await createAdminClient();
       return await databases.createDocument(
         APPWRITE_CONFIG.databaseId,
         APPWRITE_CONFIG.collections.logs,
@@ -25,10 +27,11 @@ export const logService = {
       throw error;
     }
   },
-
+ 
   // Загрузка фотографий в хранилище
   async uploadPhotos(files: File[]) {
     try {
+      const { storage } = await createAdminClient();
       const uploadPromises = files.map(file => 
         storage.createFile(
           APPWRITE_CONFIG.buckets.photos,
@@ -43,10 +46,11 @@ export const logService = {
       throw error;
     }
   },
-
+ 
   // Получение последних логов пользователя
   async getRecentLogs(userId: string, limit = 10) {
     try {
+      const { databases } = await createAdminClient();
       const response = await databases.listDocuments(
         APPWRITE_CONFIG.databaseId,
         APPWRITE_CONFIG.collections.logs,

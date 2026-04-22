@@ -1,7 +1,10 @@
-import { databases, APPWRITE_CONFIG } from "@/lib/appwrite/config";
-import { Query, ID } from "appwrite";
-import { telegramService } from "@/lib/telegram/service";
+"use server";
 
+import { APPWRITE_CONFIG } from "@/lib/appwrite/config";
+import { createAdminClient } from "@/lib/appwrite/server";
+import { Query, ID } from "node-appwrite";
+import { telegramService } from "@/lib/telegram/service";
+ 
 export interface DB_Log {
   $id: string;
   client_id: string;
@@ -11,7 +14,7 @@ export interface DB_Log {
   photo?: string;
   $createdAt: string;
 }
-
+ 
 export async function createLogAction(
   clientId: string, 
   clientName: string, 
@@ -22,6 +25,7 @@ export async function createLogAction(
   photo?: string
 ) {
   try {
+    const { databases } = await createAdminClient();
     const log = await databases.createDocument(
       APPWRITE_CONFIG.databaseId,
       APPWRITE_CONFIG.collections.logs,
@@ -35,21 +39,22 @@ export async function createLogAction(
         expert: expertSlug
       }
     );
-
+ 
     // Уведомляем эксперта в Telegram
     if (expertSlug) {
       await telegramService.sendActivityNotification(clientName, type, value, expertSlug);
     }
-
+ 
     return { success: true, data: log };
   } catch (error) {
     console.error("Error creating log:", error);
     return { success: false, error };
   }
 }
-
+ 
 export async function getClientLogs(clientId: string) {
   try {
+    const { databases } = await createAdminClient();
     const response = await databases.listDocuments(
       APPWRITE_CONFIG.databaseId,
       APPWRITE_CONFIG.collections.logs,
@@ -59,7 +64,7 @@ export async function getClientLogs(clientId: string) {
         Query.limit(20)
       ]
     );
-
+ 
     return response.documents as unknown as DB_Log[];
   } catch (error) {
     console.error("Error fetching logs:", error);
