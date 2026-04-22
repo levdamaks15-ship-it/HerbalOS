@@ -141,8 +141,8 @@ export default function DashboardPage() {
   const currentDayIdx = (new Date().getDay() + 6) % 7;
 
   const handleSaveLog = async (data: { type: "weight" | "food"; value?: number; comment?: string; timestamp: string }) => {
-    const effectiveUserId = user?.id ? String(user.id) : "demo-client-123";
-    const clientName = user?.first_name || "Марафонец";
+    const effectiveUserId = twaUser?.id ? String(twaUser.id) : "demo-client-123";
+    const clientName = twaUser?.first_name || "Марафонец";
     
     const result = await createLogAction(
       effectiveUserId,
