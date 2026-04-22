@@ -9,17 +9,17 @@ import {
   Filter, 
   TrendingDown, 
   TrendingUp,
-  Clock,
   ChevronRight,
   ShieldCheck,
-  Lock,
-  BookOpen,
   Plus,
   Image as ImageIcon,
   Trash2,
-  LayoutDashboard,
   ArrowRight,
-  CheckCircle
+  CheckCircle,
+  LogOut,
+  Newspaper,
+  Lock,
+  BookOpen
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -114,7 +114,7 @@ export default function AdminPage() {
        lastActive: "1ч назад",
        expert: slug as string
     }
-  ], []);
+  ], [slug]);
 
   useEffect(() => {
     async function loadAdminData() {
@@ -457,7 +457,7 @@ export default function AdminPage() {
                 onClick={() => setActiveTab("risk")}
                 className={cn("w-14 h-14 rounded-2xl transition-all shadow-sm", (activeTab === "risk" || activeTab === "all") ? "bg-primary text-white shadow-primary/20" : "text-graphite/20 hover:text-primary")}
              >
-                <LayoutDashboard size={28} />
+                <Users size={28} />
              </Button>
              <Button 
                 variant="ghost" 
@@ -465,14 +465,12 @@ export default function AdminPage() {
                 onClick={() => setActiveTab("content")}
                 className={cn("w-14 h-14 rounded-2xl transition-all shadow-sm", activeTab === "content" ? "bg-primary text-white shadow-primary/20" : "text-graphite/20 hover:text-primary")}
              >
-                <BookOpen size={28} />
+                <Newspaper size={28} />
              </Button>
-             <Button variant="ghost" size="icon" className="w-14 h-14 rounded-2xl text-graphite/20 hover:text-primary transition-all"><Clock size={28} /></Button>
-             <Button variant="ghost" size="icon" className="w-14 h-14 rounded-2xl text-graphite/20 hover:text-primary transition-all"><Users size={28} /></Button>
           </div>
           <div className="mt-auto">
-             <Button onClick={handleLogout} variant="ghost" size="icon" className="w-14 h-14 rounded-2xl text-red-400 hover:bg-red-50 hover:text-red-600 transition-all">
-                <Lock size={24} />
+             <Button onClick={handleLogout} variant="ghost" size="icon" title="Выйти" className="w-14 h-14 rounded-2xl text-red-400 hover:bg-red-50 hover:text-red-600 transition-all">
+                <LogOut size={24} />
              </Button>
           </div>
        </div>
@@ -505,6 +503,14 @@ export default function AdminPage() {
                 <div className="w-12 h-12 rounded-[20px] bg-primary/10 border-2 border-white shadow-xl flex items-center justify-center text-primary">
                    <ShieldCheck size={24} />
                 </div>
+                <Button 
+                   onClick={handleLogout}
+                   variant="ghost" 
+                   size="icon" 
+                   className="md:hidden w-12 h-12 rounded-[20px] bg-red-50 text-red-500 hover:bg-red-100 transition-all ml-2"
+                >
+                   <LogOut size={24} />
+                </Button>
              </div>
           </header>
 

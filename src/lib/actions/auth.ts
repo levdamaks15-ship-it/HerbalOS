@@ -1,6 +1,5 @@
 "use server";
 
-import { authService } from "@/lib/appwrite/services/auth";
 import { createAdminClient, createSessionClient } from "@/lib/appwrite/server";
 import { cookies } from "next/headers";
 
@@ -18,8 +17,9 @@ export async function getCurrentUserAction() {
     
     console.log("DEBUG: getCurrentUserAction - user found:", user.name);
     return user;
-  } catch (error: any) {
-    console.log("DEBUG: getCurrentUserAction - error:", error.message);
+  } catch (error) {
+    const err = error as Error;
+    console.log("DEBUG: getCurrentUserAction - error:", err.message);
     return null;
   }
 }
@@ -41,9 +41,10 @@ export async function loginAction(email: string, pass: string) {
     });
 
     return { success: true };
-  } catch (error: any) {
-    console.error("loginAction error:", error.message);
-    return { success: false, error: error.message };
+  } catch (error) {
+    const err = error as Error;
+    console.error("loginAction error:", err.message);
+    return { success: false, error: err.message };
   }
 }
 

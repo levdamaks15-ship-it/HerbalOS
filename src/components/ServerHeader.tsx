@@ -3,18 +3,21 @@ import Link from "next/link";
 import { getCurrentUserAction } from "@/lib/actions/auth";
 import { getCurrentClientAction } from "@/lib/actions/clients";
 import { Button } from "@/components/ui/button";
-import { User, LayoutDashboard, LogOut, Home } from "lucide-react";
+import { User, LayoutDashboard } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
+import { DB_Client } from "@/lib/actions/clients";
+
+export interface ServerHeaderProps {
+  slug: string;
+  initialUser: { name: string; email: string } | null;
+  initialProfile: DB_Client | null;
+}
 
 export async function ServerHeader({ 
   slug, 
   initialUser, 
   initialProfile 
-}: { 
-  slug: string;
-  initialUser?: any;
-  initialProfile?: any;
-}) {
+}: ServerHeaderProps) {
   // Используем переданные данные или получаем их сами (для гибкости)
   const user = initialUser !== undefined ? initialUser : await getCurrentUserAction();
   const clientProfile = initialProfile !== undefined ? initialProfile : (user ? await getCurrentClientAction() : null);

@@ -90,12 +90,12 @@ export function Quiz({
   overrideTitle, 
   userName 
 }: { 
-  onComplete: (data: any) => void;
+  onComplete: (data: Record<string, string | string[]>) => void;
   overrideTitle?: string;
   userName?: string;
 }) {
   const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
   const [showResult, setShowResult] = useState(false);
 
   // Load from localStorage to not lose data
@@ -103,8 +103,12 @@ export function Quiz({
     const saved = localStorage.getItem("quiz_progress");
     if (saved) {
       const { step: s, answers: a } = JSON.parse(saved);
-      setStep(s);
-      setAnswers(a);
+      // Используем setTimeout, чтобы вынести setState из синхронного потока эффекта
+      // и избежать предупреждения о каскадных рендерах
+      setTimeout(() => {
+        setStep(s);
+        setAnswers(a);
+      }, 0);
     }
   }, []);
 
@@ -129,7 +133,7 @@ export function Quiz({
     if (step > 0) setStep(step - 1);
   };
 
-  const updateAnswer = (id: string, value: any) => {
+  const updateAnswer = (id: string, value: string | string[]) => {
     setAnswers((prev) => ({ ...prev, [id]: value }));
   };
 
@@ -142,8 +146,8 @@ export function Quiz({
 
   // Logic for calculations
   const calculateBMI = () => {
-    const w = parseFloat(answers.weight);
-    const h = parseFloat(answers.height) / 100;
+    const w = parseFloat(answers.weight as string);
+    const h = parseFloat(answers.height as string) / 100;
     return (w / (h * h)).toFixed(1);
   };
 
@@ -157,7 +161,7 @@ export function Quiz({
   if (showResult) {
     const bmi = parseFloat(calculateBMI());
     const category = getBMICategory(bmi);
-    const water = (parseFloat(answers.weight) * 0.03).toFixed(1);
+    const water = (parseFloat(answers.weight as string) * 0.03).toFixed(1);
 
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
@@ -257,8 +261,8 @@ export function Quiz({
                     className="w-full justify-start h-16 text-lg"
                     onClick={() => {
                       const next = isActive 
-                        ? currentAnswers.filter((v: string) => v !== opt.value)
-                        : [...currentAnswers, opt.value];
+                        ? (currentAnswers as string[]).filter((v: string) => v !== opt.value)
+                        : [...(currentAnswers as string[]), opt.value];
                       updateAnswer(currentQ.id, next);
                     }}
                   >

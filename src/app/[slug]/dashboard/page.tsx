@@ -18,18 +18,15 @@ import {
   LayoutDashboard,
   Sparkles,
   Trophy as TrophyIcon,
-  User,
-  Home,
-  LogOut
+  User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { getClientLogs, createLogAction, DB_Log } from "@/lib/actions/logs";
 import { getCurrentClientAction, DB_Client } from "@/lib/actions/clients";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useTWA } from "@/components/TWAProvider";
-import { AuthProvider, useAuth } from "@/components/AuthProvider";
 import { LogModal } from "@/components/LogModal";
 import { StorySubmission } from "@/components/StorySubmission";
 import Link from "next/link";
@@ -84,9 +81,7 @@ const DEMO_LOGS: DB_Log[] = [
 
 export default function DashboardPage() {
   const { slug } = useParams();
-  const router = useRouter();
   const { user: twaUser } = useTWA();
-  const { logout } = useAuth();
   const [modalType, setModalType] = useState<"weight" | "food" | null>(null);
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [logs, setLogs] = useState<DB_Log[]>([]);
@@ -94,13 +89,11 @@ export default function DashboardPage() {
   const [activeView, setActiveView] = useState<"dashboard" | "settings">("dashboard");
   const [reminders, setReminders] = useState({ breakfast: true, dinner: true, water: false });
 
-  const [clientData, setClientData] = useState<any>(null);
+  const [clientData, setClientData] = useState<DB_Client | null>(null);
 
   React.useEffect(() => {
     async function loadData() {
       try {
-        setIsLoading(true);
-        
         // 1. Пытаемся получить данные текущего залогиненного клиента
         const currentClient = await getCurrentClientAction();
         
@@ -140,7 +133,7 @@ export default function DashboardPage() {
   const weekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
   const currentDayIdx = (new Date().getDay() + 6) % 7;
 
-  const handleSaveLog = async (data: { type: "weight" | "food"; value?: number; comment?: string; timestamp: string }) => {
+  const handleSaveLog = async (data: { type: string; value?: number; comment?: string; photos?: File[]; timestamp: string }) => {
     const effectiveUserId = twaUser?.id ? String(twaUser.id) : "demo-client-123";
     const clientName = twaUser?.first_name || "Марафонец";
     
@@ -222,6 +215,7 @@ export default function DashboardPage() {
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-3xl bg-primary/20 flex items-center justify-center overflow-hidden border-4 border-white shadow-xl">
                    {clientData?.photo_url || twaUser?.photo_url ? (
+                     // eslint-disable-next-line @next/next/no-img-element
                      <img src={clientData?.photo_url || twaUser?.photo_url} alt="Profile" className="w-full h-full object-cover" />
                    ) : (
                      <LayoutDashboard size={28} className="text-primary" />

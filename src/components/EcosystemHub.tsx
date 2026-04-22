@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { 
   Newspaper, 
   Target, 
-  Bot, 
   ArrowUpRight,
   Lock,
   BookOpen

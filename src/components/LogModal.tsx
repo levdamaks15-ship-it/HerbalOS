@@ -2,9 +2,8 @@
 
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Camera, Scale, AlertTriangle, CheckCircle2, Loader2, Plus } from "lucide-react";
+import { X, Camera, Scale, AlertTriangle, Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 type ModalProps = {
@@ -12,7 +11,7 @@ type ModalProps = {
   onClose: () => void;
   type: "weight" | "food";
   lastWeight?: number;
-  onSave: (data: any) => Promise<void>;
+  onSave: (data: { type: string; value?: number; comment?: string; photos?: File[]; timestamp: string }) => Promise<void>;
 };
 
 export function LogModal({ isOpen, onClose, type, lastWeight, onSave }: ModalProps) {
@@ -166,10 +165,11 @@ export function LogModal({ isOpen, onClose, type, lastWeight, onSave }: ModalPro
                       <Plus size={24} />
                       <span className="text-[10px] font-bold uppercase mt-1">Фото</span>
                    </button>
-                   {previews.map((src, i) => (
-                     <div key={i} className="w-24 h-24 shrink-0 rounded-2xl overflow-hidden relative group">
-                        <img src={src} className="w-full h-full object-cover" alt="Preview" />
-                        <button 
+                    {previews.map((src, i) => (
+                      <div key={i} className="w-24 h-24 shrink-0 rounded-2xl overflow-hidden relative group">
+                         {/* eslint-disable-next-line @next/next/no-img-element */}
+                         <img src={src} className="w-full h-full object-cover" alt="Preview" />
+                         <button 
                           className="absolute top-1 right-1 bg-graphite/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                           onClick={() => {
                             setPreviews(prev => prev.filter((_, idx) => idx !== i));

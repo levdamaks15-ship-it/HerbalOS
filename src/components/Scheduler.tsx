@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Calendar as CalendarIcon, Clock, CheckCircle2, MessageCircle, AlertCircle, Sparkles, Lock } from "lucide-react";
+import { Clock, MessageCircle, AlertCircle, Sparkles, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -18,8 +18,16 @@ export function Scheduler({ expertName, onConfirm }: SchedulerProps) {
   const [password, setPassword] = useState("");
   const [agreed, setAgreed] = useState(false);
 
-  // Генерируем дефицит (от 2 до 5)
-  const spots = useMemo(() => Math.floor(Math.random() * (5 - 2 + 1)) + 2, []);
+  // Генерируем дефицит (от 2 до 5) при монтировании
+  const [spots, setSpots] = useState(2);
+  
+  React.useEffect(() => {
+    // Используем setTimeout для избежания каскадных рендеров
+    const timer = setTimeout(() => {
+      setSpots(Math.floor(Math.random() * (5 - 2 + 1)) + 2);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Генерируем даты на 7 дней вперед
   const dates = useMemo(() => {

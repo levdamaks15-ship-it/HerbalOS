@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { 
   User, 
@@ -13,16 +13,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useParams, useRouter } from "next/navigation";
-import { authService } from "@/lib/appwrite/services/auth";
-import { useAuth } from "@/components/AuthProvider";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { loginAction, logoutAction } from "@/lib/actions/auth";
 
 export default function ClientLoginPage() {
   const { slug } = useParams();
-  const router = useRouter();
-  const { refresh } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +40,7 @@ export default function ClientLoginPage() {
       } else {
         setError(result.error || "Неверный email или пароль.");
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Login error:", err);
       setError("Неверный email или пароль. Убедитесь, что вы уже прошли Wellness Quiz.");
     } finally {

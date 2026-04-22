@@ -3,25 +3,17 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { 
-  User, 
-  Sparkles,
-  LayoutDashboard
+  Sparkles
 } from "lucide-react";
-import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { EcosystemHub } from "@/components/EcosystemHub";
 import { FloatingTelegram } from "@/components/FloatingTelegram";
 import { ResultsShowcase } from "@/components/ResultsShowcase";
-
-// Мы переходим на динамические данные из getPosts()
 import { useAuth } from "@/components/AuthProvider";
-import { LogOut } from "lucide-react";
 
 export default function ExpertPortalPage() {
   const { slug } = useParams();
-  const { user, clientProfile, logout, isLoading } = useAuth();
+  const { logout } = useAuth();
   const expertName = "Эксперт Гербалайф";
 
   return (
@@ -70,7 +62,7 @@ export default function ExpertPortalPage() {
         <ResultsShowcase slug={slug as string} />
 
         <footer className="mt-8 text-center border-t border-graphite/5 pt-8 px-6">
-           <div className="text-primary text-2xl font-black italic  mb-4">Herbal OS</div>
+           <div className="text-primary text-2xl font-black italic  mb-4" onClick={() => logout()}>Herbal OS</div>
            <p className="text-[10px] font-bold text-graphite/30 uppercase  mb-8">Professional Expert Portal • 2024</p>
         </footer>
       </main>

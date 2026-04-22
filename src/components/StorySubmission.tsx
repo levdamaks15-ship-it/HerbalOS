@@ -126,7 +126,11 @@ export function StorySubmission({ isOpen, onClose, expertSlug, clientId }: Story
                       className="aspect-square rounded-[32px] border-2 border-dashed border-graphite/10 bg-graphite/2 hover:bg-primary/5 hover:border-primary/30 transition-all cursor-pointer flex flex-col items-center justify-center gap-4 overflow-hidden group"
                     >
                       {previewBefore ? (
-                        <img src={previewBefore} className="w-full h-full object-cover" alt="Before" />
+                        <div className="relative w-full h-full">
+                           {/* eslint-disable-next-line @next/next/no-img-element */}
+                           <img src={previewBefore} className="w-full h-full object-cover" alt="Before" />
+                           <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase">До</div>
+                        </div>
                       ) : (
                         <>
                           <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-graphite/20 group-hover:text-primary transition-colors">
@@ -143,7 +147,11 @@ export function StorySubmission({ isOpen, onClose, expertSlug, clientId }: Story
                       className="aspect-square rounded-[32px] border-2 border-dashed border-graphite/10 bg-graphite/2 hover:bg-primary/5 hover:border-primary/30 transition-all cursor-pointer flex flex-col items-center justify-center gap-4 overflow-hidden group"
                     >
                       {previewAfter ? (
-                        <img src={previewAfter} className="w-full h-full object-cover" alt="After" />
+                        <div className="relative w-full h-full">
+                           {/* eslint-disable-next-line @next/next/no-img-element */}
+                           <img src={previewAfter} className="w-full h-full object-cover" alt="After" />
+                           <div className="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase">После</div>
+                        </div>
                       ) : (
                         <>
                           <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-graphite/20 group-hover:text-primary transition-colors">

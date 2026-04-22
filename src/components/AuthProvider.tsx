@@ -5,9 +5,16 @@ import { authService } from "@/lib/appwrite/services/auth";
 import { getCurrentClientAction, DB_Client } from "@/lib/actions/clients";
 import { usePathname } from "next/navigation";
 
+interface AppwriteUser {
+  $id: string;
+  email: string;
+  name: string;
+  [key: string]: unknown;
+}
+
 interface AuthContextType {
-  user: any | null; // Пользователь из Appwrite Auth
-  clientProfile: DB_Client | null; // Профиль из коллекции clients (если это клиент)
+  user: AppwriteUser | null;
+  clientProfile: DB_Client | null;
   isLoading: boolean;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -22,11 +29,11 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<AppwriteUser | null>(null);
   const [clientProfile, setClientProfile] = useState<DB_Client | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const checkAuth = async () => {
+  const checkAuth = React.useCallback(async () => {
     try {
       setIsLoading(true);
       const { getCurrentUserAction } = await import("@/lib/actions/auth");
@@ -47,13 +54,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const pathname = usePathname();
 
   useEffect(() => {
-    checkAuth();
-  }, [pathname]);
+    const timer = setTimeout(() => {
+      checkAuth();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [pathname, checkAuth]);
 
   const logout = async () => {
     try {
