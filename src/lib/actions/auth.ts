@@ -1,7 +1,7 @@
 "use server";
 
 import { authService } from "@/lib/appwrite/services/auth";
-import { createSessionClient } from "@/lib/appwrite/server";
+import { createAdminClient, createSessionClient } from "@/lib/appwrite/server";
 import { cookies } from "next/headers";
 
 export async function getCurrentUserAction() {
