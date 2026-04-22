@@ -34,6 +34,13 @@ export default function ClientLoginPage() {
     setError("");
 
     try {
+      // Сначала принудительно выходим из любой старой сессии
+      try {
+        await authService.logout();
+      } catch (e) {
+        // Если сессии не было - игнорируем ошибку
+      }
+
       await authService.login(email, password);
       router.push(`/${slug}/dashboard`);
     } catch (err: any) {
