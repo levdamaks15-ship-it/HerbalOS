@@ -104,8 +104,9 @@ export default function DashboardPage() {
           const data = await getClientLogs(currentClient.$id);
           setLogs(data.length > 0 ? data : DEMO_LOGS);
         } else {
-          // ЕСЛИ КЛИЕНТ НЕ ЗАЛОГИНЕН — ОТПРАВЛЯЕМ НА СТРАНИЦУ ВХОДА
-          router.push(`/${slug}/login`);
+          // Если клиент не найден, мы просто прекращаем загрузку
+          // и покажем специальный экран в рендере ниже
+          setClientData(null);
         }
       } catch (e) {
         console.error("Dashboard: Error loading data", e);
@@ -114,7 +115,7 @@ export default function DashboardPage() {
       }
     }
     loadData();
-  }, [slug, router]);
+  }, [slug]);
 
   const weightLogs = logs.filter(l => l.type === 'weight');
   const currentWeight = weightLogs.length > 0 ? parseFloat(weightLogs[0].value) : 82.4;
@@ -173,7 +174,36 @@ export default function DashboardPage() {
       />
 
       <AnimatePresence mode="wait">
-        {activeView === "dashboard" ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center min-h-screen">
+             <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+          </div>
+        ) : !clientData ? (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-8"
+          >
+            <div className="w-24 h-24 bg-graphite/5 rounded-[40px] flex items-center justify-center text-graphite/20">
+               <User size={48} />
+            </div>
+            <div className="space-y-4">
+              <h2 className="text-2xl font-black italic">Профиль не найден</h2>
+              <p className="text-sm text-graphite/40 font-medium max-w-xs mx-auto">
+                Похоже, вы зашли под аккаунтом без анкеты участника. 
+                Убедитесь, что вы прошли Wellness-тест.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 w-full max-w-[240px]">
+              <Link href={`/${slug}/login`}>
+                <Button className="w-full h-14 rounded-2xl font-black">Войти в другой аккаунт</Button>
+              </Link>
+              <Link href={`/${slug}`}>
+                <Button variant="ghost" className="w-full h-14 rounded-2xl font-black text-graphite/40">На главную</Button>
+              </Link>
+            </div>
+          </motion.div>
+        ) : activeView === "dashboard" ? (
           <motion.div 
             key="dash"
             initial={{ opacity: 0, x: -20 }}

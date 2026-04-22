@@ -25,20 +25,8 @@ export default function ClientLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Проверяем, не залогинен ли уже пользователь
-  useEffect(() => {
-    async function checkSession() {
-      try {
-        const user = await authService.getCurrentUser();
-        if (user) {
-          router.push(`/${slug}/dashboard`);
-        }
-      } catch (e) {
-        // Не залогинен - это нормально
-      }
-    }
-    checkSession();
-  }, [slug, router]);
+  // Убрали автоматический редирект, чтобы избежать бесконечных циклов
+  // если залогинен Эксперт или пользователь без анкеты.
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
