@@ -76,6 +76,13 @@ const QUESTIONS: Question[] = [
     placeholder: "Ваше имя",
     inputType: "text",
   },
+  {
+    id: "email",
+    type: "input",
+    title: "Ваш e-mail для связи",
+    placeholder: "example@mail.com",
+    inputType: "email",
+  },
 ];
 
 export function Quiz({ 

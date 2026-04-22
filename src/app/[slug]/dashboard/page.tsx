@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { getClientLogs, createLogAction, DB_Log } from "@/lib/actions/logs";
+import { getCurrentClientAction, DB_Client } from "@/lib/actions/clients";
 import { useParams } from "next/navigation";
 import { useTWA } from "@/components/TWAProvider";
 import { LogModal } from "@/components/LogModal";
@@ -86,15 +87,35 @@ export default function DashboardPage() {
   const [activeView, setActiveView] = useState<"dashboard" | "settings">("dashboard");
   const [reminders, setReminders] = useState({ breakfast: true, dinner: true, water: false });
 
+  const [clientData, setClientData] = useState<any>(null);
+
   React.useEffect(() => {
-    async function loadLogs() {
-      const clientId = user?.id ? String(user.id) : "demo-client-123";
-      const data = await getClientLogs(clientId);
-      setLogs(data.length > 0 ? data : DEMO_LOGS);
-      setIsLoading(false);
+    async function loadData() {
+      try {
+        setIsLoading(true);
+        
+        // 1. Пытаемся получить данные текущего залогиненного клиента
+        const currentClient = await getCurrentClientAction();
+        
+        if (currentClient) {
+          setClientData(currentClient);
+          // 2. Загружаем логи этого клиента
+          const data = await getClientLogs(currentClient.$id);
+          setLogs(data.length > 0 ? data : DEMO_LOGS);
+        } else {
+          // Если не залогинен, проверяем TWA или показываем демо
+          const clientId = user?.id ? String(user.id) : "demo-client-123";
+          const data = await getClientLogs(clientId);
+          setLogs(data.length > 0 ? data : DEMO_LOGS);
+        }
+      } catch (e) {
+        console.error("Dashboard: Error loading data", e);
+      } finally {
+        setIsLoading(false);
+      }
     }
-    loadLogs();
-  }, [user]);
+    loadData();
+  }, [slug, user]);
 
   const weightLogs = logs.filter(l => l.type === 'weight');
   const currentWeight = weightLogs.length > 0 ? parseFloat(weightLogs[0].value) : 82.4;

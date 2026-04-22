@@ -1,7 +1,7 @@
 "use server";
 
+import { createAdminClient, createSessionClient } from "@/lib/appwrite/server";
 import { APPWRITE_CONFIG } from "@/lib/appwrite/config";
-import { createAdminClient } from "@/lib/appwrite/server";
 import { Query } from "node-appwrite";
 
 export interface DB_Client {
@@ -39,6 +39,27 @@ export async function getClients(expertSlug: string) {
       collectionId: APPWRITE_CONFIG.collections.clients 
     });
     return [];
+  }
+}
+
+export async function getCurrentClientAction() {
+  try {
+    const { account } = await createSessionClient();
+    const user = await account.get();
+
+    const { databases } = await createAdminClient();
+    const response = await databases.listDocuments(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.collections.clients,
+      [Query.equal("userId", user.$id)]
+    );
+
+    if (response.documents.length > 0) {
+      return JSON.parse(JSON.stringify(response.documents[0])) as DB_Client;
+    }
+    return null;
+  } catch (error) {
+    return null;
   }
 }
 

@@ -18,6 +18,7 @@ import { onQuizCompleteAction } from "@/lib/actions/quiz";
 
 interface QuizData {
   name?: string;
+  email?: string;
   weight?: string;
   height?: string;
   goal?: string;
