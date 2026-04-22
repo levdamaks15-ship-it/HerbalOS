@@ -17,7 +17,8 @@ import {
   Info,
   LayoutDashboard,
   Sparkles,
-  Trophy as TrophyIcon
+  Trophy as TrophyIcon,
+  User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,6 +29,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useTWA } from "@/components/TWAProvider";
 import { LogModal } from "@/components/LogModal";
 import { StorySubmission } from "@/components/StorySubmission";
+import Link from "next/link";
 
 const DEMO_LOGS: DB_Log[] = [
   {
