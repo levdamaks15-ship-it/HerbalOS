@@ -32,7 +32,7 @@ export default function ExpertPortalPage() {
             <Button asChild variant="ghost" className="rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase  gap-2 bg-graphite/5 hover:bg-graphite/10 px-3 h-10">
                <Link href={`/${slug}/dashboard`}>
                   <User size={16} className="text-primary shrink-0" /> 
-                  <span className="hidden xs:inline-block">Партнер</span>
+                  <span className="hidden xs:inline-block">Мой дневник</span>
                </Link>
             </Button>
             <Button asChild className="rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase  h-10 px-3 sm:px-5 shadow-lg shadow-primary/20 flex items-center gap-2">
