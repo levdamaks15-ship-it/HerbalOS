@@ -204,7 +204,18 @@ bot.on("message:text", async (ctx) => {
       return await ctx.reply("Я почти нашел ответ... Секундочку! 🌿");
     }
 
-    return await ctx.reply(result as string);
+    let aiResponse = result as string;
+
+    // ПРОВЕРКА НА ЗОВ НАСТАВНИКА
+    if (aiResponse.includes("[CALL_MENTOR]")) {
+      aiResponse = aiResponse.replace("[CALL_MENTOR]", "").trim();
+      
+      const { telegramService } = await import("@/lib/telegram/service");
+      await telegramService.sendSupportRequest(clientName, userMessage, chatId);
+      console.log(`[Bot] Support request sent for update ${updateId}`);
+    }
+
+    return await ctx.reply(aiResponse);
   } catch (err) {
     console.error(`[Bot] Error in update ${updateId}:`, err);
     return await ctx.reply("Ваше сообщение получено. Я скоро вернусь с ответом! 🌿");

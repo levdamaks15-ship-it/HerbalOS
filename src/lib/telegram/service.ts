@@ -186,5 +186,35 @@ ${message}
     } catch (error) {
       console.error("Error sending quiz completion summary:", error);
     }
+  },
+
+  // Уведомление эксперта о том, что нужен "живой" ответ
+  async sendSupportRequest(clientName: string, userMessage: string, userChatId: string) {
+    if (!bot) return;
+    const adminChatId = process.env.TELEGRAM_LEADS_CHAT_ID;
+    if (!adminChatId) return;
+
+    const message = `
+🆘 *НУЖНА ПОМОЩЬ НАСТАВНИКА*
+--------------------------------
+👤 *Клиент:* ${clientName}
+🆔 *ID чата:* \`${userChatId}\`
+📝 *Вопрос:* _${userMessage}_
+--------------------------------
+#support #request
+`;
+
+    try {
+      await bot.api.sendMessage(adminChatId, message, {
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "💬 Перейти к диалогу", url: `tg://user?id=${userChatId}` }]
+          ]
+        }
+      });
+    } catch (error) {
+      console.error("Error sending support request to admin:", error);
+    }
   }
 };
