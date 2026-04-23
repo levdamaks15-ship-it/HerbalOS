@@ -205,6 +205,7 @@ bot.on("message:text", async (ctx) => {
     }
 
     let aiResponse = result as string;
+    const slug = "expert"; // Слаг эксперта для бота
 
     // ПРОВЕРКА НА ЗОВ НАСТАВНИКА
     if (aiResponse.includes("[CALL_MENTOR]")) {
