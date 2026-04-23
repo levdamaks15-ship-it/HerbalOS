@@ -107,9 +107,9 @@ export function PostModal({ isOpen, onClose, onSuccess }: PostModalProps) {
       });
       setPreviews({});
       setStep(1);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Submit failed", error);
-      alert("Ошибка при сохранении поста");
+      alert("Ошибка при сохранении поста: " + (error?.message || "Неизвестная ошибка"));
     } finally {
       setIsLoading(false);
     }
