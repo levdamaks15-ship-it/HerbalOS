@@ -251,7 +251,7 @@ export default function AdminPage() {
                   console.log("Opening PostModal...");
                   setIsPostModalOpen(true);
                 }}
-                className="rounded-2xl h-14 px-8 text-md font-black gap-3 shadow-xl shadow-primary/20"
+                className="rounded-2xl h-11 px-6 text-xs font-black gap-2 shadow-xl shadow-primary/20 shrink-0"
               >
                  <Plus size={20} /> Создать пост
               </Button>
@@ -455,7 +455,7 @@ export default function AdminPage() {
                           </div>
 
                           <div className="p-6 flex items-center justify-start gap-3 px-6">
-                             <Button className="rounded-2xl h-14 px-8 font-black text-xs uppercase group-hover:bg-primary transition-all shadow-md">
+                             <Button className="rounded-2xl h-11 px-6 font-black text-[10px] uppercase group-hover:bg-primary transition-all shadow-md">
                                 Подробнее <ChevronRight size={18} className="ml-1" />
                              </Button>
                           </div>
