@@ -185,7 +185,7 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                         className="prose prose-sm sm:prose lg:prose-lg max-w-none text-graphite/90 font-medium 
                                    prose-headings:text-graphite prose-headings:font-black 
                                    prose-p:leading-relaxed prose-strong:text-primary"
-                        dangerouslySetInnerHTML={{ __html: post.content }} 
+                        dangerouslySetInnerHTML={{ __html: post.content || "" }} 
                      />
                   </div>
 
