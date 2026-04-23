@@ -87,7 +87,7 @@ export function PostModal({ isOpen, onClose, onSuccess }: PostModalProps) {
       await submitStoryAction({
         ...formData,
         expert: slug as string,
-        // likes, comments, date, status are handled by server action
+        status: "published"
       } as any);
       onSuccess();
       onClose();

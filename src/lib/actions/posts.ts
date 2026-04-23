@@ -84,7 +84,7 @@ export async function submitStoryAction(data: Omit<DB_Post, "$id" | "likes" | "c
       }
     }
  
-    return response as unknown as DB_Post;
+    return JSON.parse(JSON.stringify(response)) as DB_Post;
   } catch (error) {
     console.error("Error submitting story:", error);
     throw error;
