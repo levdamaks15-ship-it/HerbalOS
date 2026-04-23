@@ -8,18 +8,10 @@ export const aiService = {
     }
 
     const genAI = new GoogleGenerativeAI(key);
-    let model;
-    try {
-      model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    } catch (e) {
-      model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    }
-
-    try {
-
-      const prompt = `
+    
+    const prompt = `
 Ты — умный и дружелюбный ассистент эксперта по здоровому образу жизни и питанию (Гербалайф).
-Твоя цель: помогать клиентам эксперта ${context.expertName}, отвечать на вопросы о питанию, продуктах и мотивации.
+Твоя цель: помогать клиентам эксперта ${context.expertName}, отвечать на вопросы о питании, продуктах и мотивации.
 
 Правила общения:
 1. Будь вежливым, позитивным и вдохновляющим.
@@ -33,15 +25,29 @@ export const aiService = {
 Вопрос клиента: ${userMessage}
 `;
 
+    // Пытаемся сначала через основную модель
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const result = await model.generateContent(prompt);
       const response = await result.response;
       return response.text();
-    } catch (error: any) {
-      console.error("AI Service Error:", error);
-      const errorStr = JSON.stringify(error, null, 2);
-      const message = error?.message || String(error);
-      return `⚠️ Ошибка AI: ${message.substring(0, 150)}... [Debug: ${errorStr.substring(0, 50)}]`;
+    } catch (primaryError: any) {
+      console.warn("Primary AI model failed, trying fallback...", primaryError.message);
+      
+      try {
+        // Пробуем запасную старую модель
+        const fallbackModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const result = await fallbackModel.generateContent(prompt);
+        const response = await result.response;
+        return response.text();
+      } catch (fallbackError: any) {
+        console.error("AI Service Error (all models failed):", fallbackError);
+        const errorStr = JSON.stringify(fallbackError, null, 2);
+        const message = fallbackError?.message || String(fallbackError);
+        return `⚠️ Ошибка AI: ${message.substring(0, 100)}... [Debug: ${errorStr.substring(0, 50)}]`;
+      }
     }
+
 
   }
 };
