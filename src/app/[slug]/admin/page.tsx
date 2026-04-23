@@ -513,7 +513,7 @@ export default function AdminPage() {
        />
 
        {/* Content Area */}
-       <div className="flex-1 flex flex-col min-w-0 bg-[#FDFCFB]">
+       <div className="flex-1 flex flex-col min-w-0 bg-[#FDFCFB] pb-28 md:pb-0">
           <header className="h-24 bg-white/70 backdrop-blur-xl border-b border-graphite/5 px-10 flex items-center justify-between z-10 sticky top-0">
              <div className="flex items-center gap-6">
                 <Link href={`/${slug}`} className="hover:opacity-70 transition-opacity">
@@ -548,6 +548,39 @@ export default function AdminPage() {
              {renderCurrentView()}
           </AnimatePresence>
        </div>
+
+        {/* Bottom Navigation (Mobile) */}
+        <div className="md:hidden fixed bottom-0 inset-x-0 bg-white/80 backdrop-blur-2xl border-t border-graphite/5 px-10 pt-4 pb-10 flex justify-around items-center z-40">
+           <button 
+              onClick={() => setActiveTab("risk")}
+              className={cn("flex flex-col items-center gap-1.5 transition-all", (activeTab === "risk" || activeTab === "all") ? "text-primary" : "text-graphite/20")}
+           >
+             <div className={cn("p-2 rounded-2xl", (activeTab === "risk" || activeTab === "all") && "bg-primary/10 shadow-inner")}>
+                <Users size={24} />
+             </div>
+             <span className="text-[10px] font-black uppercase tracking-tight">Клиенты</span>
+           </button>
+           
+           <button 
+              onClick={() => setActiveTab("content")}
+              className={cn("flex flex-col items-center gap-1.5 transition-all", activeTab === "content" ? "text-primary" : "text-graphite/20")}
+           >
+             <div className={cn("p-2 rounded-2xl", activeTab === "content" && "bg-primary/10 shadow-inner")}>
+                <Newspaper size={24} />
+             </div>
+             <span className="text-[10px] font-black uppercase tracking-tight">Издательство</span>
+           </button>
+
+           <button 
+              onClick={handleLogout}
+              className="flex flex-col items-center gap-1.5 text-red-400"
+           >
+             <div className="p-2 rounded-2xl bg-red-50">
+                <LogOut size={24} />
+             </div>
+             <span className="text-[10px] font-black uppercase tracking-tight">Выход</span>
+           </button>
+        </div>
     </main>
   );
 }
