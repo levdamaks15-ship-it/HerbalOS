@@ -66,8 +66,7 @@ export function PostModal({ isOpen, onClose, onSuccess }: PostModalProps) {
     try {
       setIsLoading(true);
       const fileId = await storageService.uploadFile(file);
-      const fileUrl = storageService.getFilePreview(fileId);
-      setFormData(v => ({ ...v, [field]: fileUrl }));
+      setFormData(v => ({ ...v, [field]: fileId }));
     } catch (error) {
       console.error("Upload failed", error);
       alert("Ошибка при загрузке изображения");
