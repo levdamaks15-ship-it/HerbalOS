@@ -4,6 +4,8 @@ import { Bot } from "grammy";
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const bot = token ? new Bot(token) : null;
 
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://herbalife-os.vercel.app";
+
 export const telegramService = {
   // Отправка уведомления о новом лида в группу или личку
   async sendLeadNotification(data: {
@@ -14,6 +16,7 @@ export const telegramService = {
     bmi: string;
     water: string;
     scheduledTime?: string;
+    clientId?: string;
   }, expertSlug: string) {
     if (!bot) return;
 
@@ -35,14 +38,24 @@ export const telegramService = {
 - Рост: ${data.height} см
 - ИМТ: ${data.bmi}
 - Вода: ${data.water} л/день
-
-🔗 [Открыть в CRM](https://herbalife-os.vercel.app/${expertSlug}/admin)
 --------------------------------
 #lead #new
 `;
 
+    const buttons = [];
+    if (data.clientId) {
+      buttons.push([{ text: "🔗 Открыть в CRM", url: `${BASE_URL}/${expertSlug}/admin/clients/${data.clientId}` }]);
+    } else {
+      buttons.push([{ text: "🔗 Открыть CRM", url: `${BASE_URL}/${expertSlug}/admin` }]);
+    }
+
     try {
-      await bot.api.sendMessage(chatId, message, { parse_mode: "Markdown" });
+      await bot.api.sendMessage(chatId, message, { 
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: buttons
+        }
+      });
       return { success: true };
     } catch (error) {
       console.error("Error sending Telegram notification:", error);
@@ -67,21 +80,26 @@ export const telegramService = {
 👤 *Клиент:* ${data.clientName}
 📝 *Тема:* ${data.title}
 📉 *Итог:* ${data.stats_weight || '?'} кг | ${data.stats_waist || '?'} см
-
-🔗 [Перейти к модерации](https://herbalife-os.vercel.app/${expertSlug}/admin)
 --------------------------------
 #moderation #ugc
 `;
 
     try {
-      await bot.api.sendMessage(chatId, message, { parse_mode: "Markdown" });
+      await bot.api.sendMessage(chatId, message, { 
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "⚖️ Перейти к модерации", url: `${BASE_URL}/${expertSlug}/admin/moderation` }]
+          ]
+        }
+      });
     } catch (error) {
       console.error("Error sending story notification:", error);
     }
   },
 
   // Уведомление об активности (вес/еда)
-  async sendActivityNotification(clientName: string, type: string, value: string, expertSlug: string) {
+  async sendActivityNotification(clientName: string, type: string, value: string, expertSlug: string, clientId?: string) {
     if (!bot) return;
     const chatId = process.env.TELEGRAM_LEADS_CHAT_ID;
     if (!chatId) return;
@@ -95,18 +113,28 @@ export const telegramService = {
 👤 *Клиент:* ${clientName}
 🏃‍♂️ *Действие:* ${activity}
 📝 *Данные:* ${detail}
-
-🔗 [Открыть CRM](https://herbalife-os.vercel.app/${expertSlug}/admin)
 --------------------------------
 #activity #client_log
 `;
 
+    const url = clientId 
+      ? `${BASE_URL}/${expertSlug}/admin/clients/${clientId}`
+      : `${BASE_URL}/${expertSlug}/admin`;
+
     try {
-      await bot.api.sendMessage(chatId, message, { parse_mode: "Markdown" });
+      await bot.api.sendMessage(chatId, message, { 
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "🔗 Открыть CRM", url }]
+          ]
+        }
+      });
     } catch (error) {
       console.error("Error sending activity notification:", error);
     }
   },
+
 
   // Прямое напоминание клиенту («Огоньки»)
   async sendPersonalReminder(chatId: string, message: string) {

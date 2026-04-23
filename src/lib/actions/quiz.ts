@@ -44,7 +44,7 @@ export async function onQuizCompleteAction(formData: QuizResults, slug: string) 
     }
 
     // 2. Сохраняем анкету клиента и привязываем userId
-    await databases.createDocument(
+    const clientDoc = await databases.createDocument(
       APPWRITE_CONFIG.databaseId,
       APPWRITE_CONFIG.collections.clients,
       ID.unique(),
@@ -61,14 +61,17 @@ export async function onQuizCompleteAction(formData: QuizResults, slug: string) 
       }
     );
     console.log("✅ Quiz saved successfully to Appwrite with userId:", userId);
+    
+    // Отправляем уведомление в Telegram с ID клиента
+    await telegramService.sendLeadNotification({
+      ...formData,
+      clientId: clientDoc.$id
+    }, slug);
   } catch (error) {
     const err = error as Error;
     console.error("❌ Appwrite Error:", err.message);
     return { success: false, error: err.message };
   }
-  
-  // Отправляем уведомление в Telegram
-  await telegramService.sendLeadNotification(formData, slug);
   
   return { success: true };
 }

@@ -42,7 +42,7 @@ export async function createLogAction(
  
     // Уведомляем эксперта в Telegram
     if (expertSlug) {
-      await telegramService.sendActivityNotification(clientName, type, value, expertSlug);
+      await telegramService.sendActivityNotification(clientName, type, value, expertSlug, clientId);
     }
  
     return { success: true, data: log };

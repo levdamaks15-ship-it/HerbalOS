@@ -113,9 +113,30 @@ bot.command("support", (ctx) => {
 
 bot.command("id", (ctx) => ctx.reply(`ID этого чата: ${ctx.chat.id}`));
 
-bot.on("message:text", (ctx) => {
+// Обработка текстовых сообщений через AI
+bot.on("message:text", async (ctx) => {
+  // Не отвечаем сами себе (эксперту)
   if (String(ctx.chat.id) === expertChatId) return;
-  return ctx.reply("Ваше сообщение получено экспертом. Мы ответим вам в ближайшее время! 🌿");
+
+  const userMessage = ctx.message.text;
+  const clientName = ctx.from?.first_name || "Клиент";
+
+  // Показываем статус "печатает..."
+  await ctx.replyWithChatAction("typing");
+
+  try {
+    const { aiService } = await import("@/lib/ai/service");
+    const aiResponse = await aiService.getBotResponse(userMessage, {
+      expertName: "Эксперт Гербалайф", // Здесь можно будет брать динамически
+      clientName: clientName
+    });
+
+    return ctx.reply(aiResponse);
+  } catch (err) {
+    console.error("Bot AI error:", err);
+    return ctx.reply("Ваше сообщение получено. Я скоро вернусь с ответом! 🌿");
+  }
 });
+
 
 export const POST = webhookCallback(bot, "std/http");
