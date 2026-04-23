@@ -93,7 +93,22 @@ bot.command("start", async (ctx) => {
     }
   }
 
-  return ctx.reply("Добро пожаловать в Herbal OS! Бот готов помогать вам в достижении целей по здоровью и весу.");
+  // Логика для гостя (если зашел просто так)
+  const chatId = String(ctx.chat.id);
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://herbalife-os.vercel.app";
+  
+  const guestKeyboard = new InlineKeyboard()
+    .webApp("🚀 Пройти Wellness-тест", `${baseUrl}/expert/quiz?chat_id=${chatId}`)
+    .row()
+    .url("🌐 Открыть Media Hub", `${baseUrl}/expert/media`);
+
+  return ctx.reply(`
+🌿 *Добро пожаловать в Herbal OS!*
+
+Я ваш персональный ассистент по здоровому образу жизни. Чтобы я мог подобрать для вас идеальный план питания и выдать подарок, мне нужно немного узнать о вас.
+
+Нажмите кнопку ниже, чтобы пройти быстрый *Wellness-тест*. Это займет всего 2 минуты, и вы сразу получите расшифровку своих показателей! 👇
+  `, { parse_mode: "Markdown", reply_markup: guestKeyboard });
 });
 
 // Быстрые ссылки

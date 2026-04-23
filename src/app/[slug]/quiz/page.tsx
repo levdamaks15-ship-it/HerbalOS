@@ -49,6 +49,8 @@ function QuizContent() {
     const finalName = quizData?.name || name || "Не указано";
     const email = quizData?.email || `${finalName.toLowerCase().replace(/\s+/g, '')}${Date.now()}@herbal.os`;
 
+    const chatId = searchParams.get("chat_id");
+    
     const result = await onQuizCompleteAction({
       name: finalName,
       email: email,
@@ -58,7 +60,8 @@ function QuizContent() {
       bmi,
       water,
       scheduledTime: `${date}, ${time}`,
-      password: password
+      password: password,
+      telegram_chat_id: chatId || undefined
     }, slug as string);
 
     if (result.success && password) {

@@ -15,6 +15,7 @@ interface QuizResults {
   bmi: string;
   water: string;
   scheduledTime?: string;
+  telegram_chat_id?: string;
 }
 
 export async function onQuizCompleteAction(formData: QuizResults, slug: string) {
@@ -57,7 +58,8 @@ export async function onQuizCompleteAction(formData: QuizResults, slug: string) 
         weight_current: parseFloat(formData.weight),
         lastActive: "Пройден Wellness-тест",
         progress: 0,
-        userId: userId // Привязываем аккаунт к анкете
+        userId: userId, // Привязываем аккаунт к анкете
+        telegram_chat_id: formData.telegram_chat_id
       }
     );
     console.log("✅ Quiz saved successfully to Appwrite with userId:", userId);
