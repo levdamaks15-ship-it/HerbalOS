@@ -1,11 +1,9 @@
 export const aiService = {
   async getBotResponse(userMessage: string, context: { expertName: string; clientName?: string; apiKey?: string }) {
     const key = context.apiKey?.trim();
-    if (!key) return "Ошибка: API ключ не найден в переменных окружения.";
+    if (!key) return "Ошибка: API ключ не найден.";
 
-    const prompt = `Ты — ассистент эксперта ${context.expertName}. Клиент ${context.clientName || "Гость"} спрашивает: ${userMessage}`;
-
-    let lastError = "";
+    const prompt = `Ты — ассистент эксперта ${context.expertName}. Ответь клиенту ${context.clientName || "Гость"}: ${userMessage}`;
 
     async function fetchAI(apiVersion: string, modelName: string) {
       const url = `https://generativelanguage.googleapis.com/${apiVersion}/models/${modelName}:generateContent?key=${key}`;
@@ -14,26 +12,33 @@ export const aiService = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
       });
-      
-      const data = await response.json().catch(() => ({}));
-
       if (!response.ok) {
-        throw new Error(`[${response.status} ${response.statusText}] ${data.error?.message || 'No detail'}`);
+        const err = await response.json().catch(() => ({}));
+        throw new Error(`${modelName} (${apiVersion}): ${err.error?.message || response.statusText}`);
       }
-      
+      const data = await response.json();
       return data.candidates?.[0]?.content?.parts?.[0]?.text;
     }
 
-    try {
-      return await fetchAI("v1beta", "gemini-1.5-flash");
-    } catch (e1: any) {
-      lastError = `1.5-Flash failed: ${e1.message}`;
+    // Расширенная цепочка попыток
+    const models = [
+      { v: "v1beta", m: "gemini-1.5-flash-latest" },
+      { v: "v1beta", m: "gemini-1.5-flash" },
+      { v: "v1", m: "gemini-1.5-flash" },
+      { v: "v1", m: "gemini-pro" },
+      { v: "v1beta", m: "gemini-pro" }
+    ];
+
+    let errors = [];
+    for (const model of models) {
       try {
-        return await fetchAI("v1", "gemini-pro");
-      } catch (e2: any) {
-        lastError += ` | Pro failed: ${e2.message}`;
-        return `❌ AI Error Debug:\n${lastError}`;
+        const result = await fetchAI(model.v, model.m);
+        if (result) return result;
+      } catch (e: any) {
+        errors.push(e.message);
       }
     }
+
+    return `❌ Ни одна модель не ответила. Ошибки:\n${errors.join("\n")}`;
   }
 };
