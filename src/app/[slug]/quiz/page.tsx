@@ -129,7 +129,7 @@ function QuizContent() {
                <div className="flex items-center gap-3 text-[10px] font-black text-graphite/20 uppercase tracking-[0.2em] bg-graphite/5 px-6 py-3 rounded-full">
                   <ShieldCheck size={14} /> Данные переданы по защищенному протоколу
                </div>
-               <p className="text-[10px] font-bold text-graphite/10 uppercase tracking-widest">© 2024 Healthy Network Ecosystem</p>
+               <p className="text-[10px] font-bold text-graphite/10 uppercase tracking-widest">© 2026 Healthy Network Ecosystem</p>
             </div>
           </motion.div>
         )}

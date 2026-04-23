@@ -93,7 +93,7 @@ export default function ExpertPortalPage() {
 
         <footer className="mt-8 text-center border-t border-graphite/5 pt-8 px-6">
            <div className="text-primary text-2xl font-black italic  mb-4 cursor-pointer" onClick={() => logout()}>Herbal OS</div>
-           <p className="text-[10px] font-bold text-graphite/30 uppercase  mb-8">Professional Expert Portal • 2024</p>
+           <p className="text-[10px] font-bold text-graphite/30 uppercase  mb-8">Professional Expert Portal • 2026</p>
         </footer>
       </main>
     </div>
