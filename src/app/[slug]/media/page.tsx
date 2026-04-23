@@ -78,6 +78,7 @@ export default function MediaPage() {
       if (!slug) return;
       try {
         const data = await getPosts(slug as string);
+        console.log("POSTS DATA FROM DB:", data);
         setPosts(data || []);
       } catch (error) {
         console.error("Failed to load posts:", error);
@@ -216,7 +217,12 @@ export default function MediaPage() {
                         <CardContent className="p-0 space-y-6">
                            <div className="relative rounded-[40px] overflow-hidden aspect-16/10 shadow-2xl bg-linear-to-br from-primary/20 via-primary/5 to-white flex items-center justify-center">
                                {getImageUrl(post.image) ? (
-                                 <img src={getImageUrl(post.image)!} alt={post.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                                 <img 
+                                   src={getImageUrl(post.image)!} 
+                                   alt={post.title} 
+                                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                                   onError={(e) => console.error("IMAGE LOAD ERROR for " + post.title, e)}
+                                 />
                                ) : (
                                  <div className="flex flex-col items-center gap-4 opacity-20">
                                     <Sparkles size={48} className="text-primary" />
