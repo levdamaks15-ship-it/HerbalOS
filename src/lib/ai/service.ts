@@ -8,12 +8,14 @@ export const aiService = {
     }
 
     const genAI = new GoogleGenerativeAI(key);
-    if (!genAI) {
-      return "Извините, мой 'мозг' (AI) сейчас не настроен. Пожалуйста, подождите эксперта! 🌿";
+    let model;
+    try {
+      model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    } catch (e) {
+      model = genAI.getGenerativeModel({ model: "gemini-pro" });
     }
 
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       const prompt = `
 Ты — умный и дружелюбный ассистент эксперта по здоровому образу жизни и питанию (Гербалайф).
