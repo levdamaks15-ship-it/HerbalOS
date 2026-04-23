@@ -1,5 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 export const aiService = {
   async getBotResponse(userMessage: string, context: { expertName: string; clientName?: string; apiKey?: string }) {
     const key = context.apiKey?.trim();
@@ -7,8 +5,6 @@ export const aiService = {
       return "Извините, мой 'мозг' (AI) сейчас не настроен (нет ключа). Пожалуйста, подождите эксперта! 🌿";
     }
 
-    const genAI = new GoogleGenerativeAI(key);
-    
     const prompt = `
 Ты — умный и дружелюбный ассистент эксперта по здоровому образу жизни и питанию (Гербалайф).
 Твоя цель: помогать клиентам эксперта ${context.expertName}, отвечать на вопросы о питании, продуктах и мотивации.
@@ -25,29 +21,39 @@ export const aiService = {
 Вопрос клиента: ${userMessage}
 `;
 
-    // Пытаемся сначала через основную модель
-    try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      return response.text();
-    } catch (primaryError: any) {
-      console.warn("Primary AI model failed, trying fallback...", primaryError.message);
+    // Прямой запрос к API через fetch (обходим проблемы SDK)
+    async function tryModel(modelName: string) {
+      const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${key}`;
       
-      try {
-        // Пробуем запасную старую модель
-        const fallbackModel = genAI.getGenerativeModel({ model: "gemini-pro" });
-        const result = await fallbackModel.generateContent(prompt);
-        const response = await result.response;
-        return response.text();
-      } catch (fallbackError: any) {
-        console.error("AI Service Error (all models failed):", fallbackError);
-        const errorStr = JSON.stringify(fallbackError, null, 2);
-        const message = fallbackError?.message || String(fallbackError);
-        return `⚠️ Ошибка AI: ${message.substring(0, 100)}... [Debug: ${errorStr.substring(0, 50)}]`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`HTTP ${response.status}: ${errorData.error?.message || response.statusText}`);
       }
+
+      const data = await response.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text;
     }
 
-
+    try {
+      // Пробуем Flash
+      return await tryModel("gemini-1.5-flash");
+    } catch (e: any) {
+      console.warn("Flash failed, trying Pro...", e.message);
+      try {
+        // Пробуем Pro
+        return await tryModel("gemini-1.5-pro");
+      } catch (fallbackError: any) {
+        console.error("All models failed:", fallbackError);
+        return `⚠️ Ошибка API: ${fallbackError.message.substring(0, 200)}`;
+      }
+    }
   }
 };
