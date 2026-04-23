@@ -140,39 +140,53 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                </div>
 
                <div className="p-8 sm:p-16 space-y-16">
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-2 gap-6 sm:gap-12">
-                     <div className="glass-card p-8 rounded-[40px] border-none shadow-sm relative overflow-hidden group">
-                        <div className="relative z-10 space-y-2">
-                           <div className="flex items-center gap-2 text-primary">
-                              <TrendingDown size={18} />
-                              <span className="text-[10px] font-black uppercase tracking-widest">Сброс веса</span>
-                           </div>
-                           <div className="text-5xl font-black italic tracking-tighter text-graphite group-hover:scale-110 transition-transform origin-left">{post.stats_weight}</div>
-                        </div>
-                        <TrendingDown className="absolute -right-4 -bottom-4 w-32 h-32 text-primary/5 -rotate-12" />
-                     </div>
-                     <div className="glass-card p-8 rounded-[40px] border-none shadow-sm relative overflow-hidden group">
-                        <div className="relative z-10 space-y-2">
-                           <div className="flex items-center gap-2 text-primary">
-                              <Target size={18} />
-                              <span className="text-[10px] font-black uppercase tracking-widest">Объемы ушли</span>
-                           </div>
-                           <div className="text-5xl font-black italic tracking-tighter text-graphite group-hover:scale-110 transition-transform origin-left">{post.stats_waist}</div>
-                        </div>
-                        <Target className="absolute -right-4 -bottom-4 w-32 h-32 text-primary/5 rotate-12" />
-                     </div>
-                  </div>
+                  {/* Stats Grid - Only for Result posts */}
+                  {post.type === "result" && (
+                    <div className="grid grid-cols-2 gap-6 sm:gap-12">
+                       <div className="glass-card p-8 rounded-[40px] border-none shadow-sm relative overflow-hidden group">
+                          <div className="relative z-10 space-y-2">
+                             <div className="flex items-center gap-2 text-primary">
+                                <TrendingDown size={18} />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Сброс веса</span>
+                             </div>
+                             <div className="text-5xl font-black italic tracking-tighter text-graphite group-hover:scale-110 transition-transform origin-left">{post.stats_weight}</div>
+                          </div>
+                          <TrendingDown className="absolute -right-4 -bottom-4 w-32 h-32 text-primary/5 -rotate-12" />
+                       </div>
+                       <div className="glass-card p-8 rounded-[40px] border-none shadow-sm relative overflow-hidden group">
+                          <div className="relative z-10 space-y-2">
+                             <div className="flex items-center gap-2 text-primary">
+                                <Target size={18} />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Объемы ушли</span>
+                             </div>
+                             <div className="text-5xl font-black italic tracking-tighter text-graphite group-hover:scale-110 transition-transform origin-left">{post.stats_waist}</div>
+                          </div>
+                          <Target className="absolute -right-4 -bottom-4 w-32 h-32 text-primary/5 rotate-12" />
+                       </div>
+                    </div>
+                  )}
 
-                  {/* Story Text */}
+                  {/* Story Text / Article Content */}
                   <div className="space-y-8 max-w-2xl">
                      <div className="flex items-center gap-4">
                         <div className="w-12 h-px bg-primary" />
-                        <span className="text-[11px] font-black uppercase tracking-[0.3em] text-primary">История героя</span>
+                        <span className="text-[11px] font-black uppercase tracking-[0.3em] text-primary">
+                          {post.type === "result" ? "История героя" : "Текст публикации"}
+                        </span>
                      </div>
-                     <p className="text-xl sm:text-2xl font-medium leading-relaxed text-graphite/80 italic first-letter:text-5xl first-letter:font-black first-letter:text-primary first-letter:mr-1 first-letter:float-left">
-                        &ldquo;{post.excerpt}&rdquo;
-                     </p>
+                     
+                     {post.excerpt && (
+                        <p className="text-xl sm:text-2xl font-medium leading-relaxed text-graphite/80 italic first-letter:text-5xl first-letter:font-black first-letter:text-primary first-letter:mr-1 first-letter:float-left mb-12">
+                           &ldquo;{post.excerpt}&rdquo;
+                        </p>
+                     )}
+
+                     <div 
+                        className="prose prose-sm sm:prose lg:prose-lg max-w-none text-graphite/90 font-medium 
+                                   prose-headings:text-graphite prose-headings:font-black 
+                                   prose-p:leading-relaxed prose-strong:text-primary"
+                        dangerouslySetInnerHTML={{ __html: post.content }} 
+                     />
                   </div>
 
                   {/* Products Section */}
