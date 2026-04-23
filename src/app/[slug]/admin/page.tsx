@@ -35,6 +35,7 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { ClientDetail } from "@/components/ClientDetail";
 import { authService } from "@/lib/appwrite/services/auth";
+import { PostModal } from "@/components/PostModal";
 
 export default function AdminPage() {
   const { slug } = useParams();
@@ -48,6 +49,7 @@ export default function AdminPage() {
   const [posts, setPosts] = useState<DB_Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState<DB_Client | null>(null);
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 
   useEffect(() => {
     async function checkSession() {
@@ -130,6 +132,12 @@ export default function AdminPage() {
     }
     loadAdminData();
   }, [slug, DEMO_CLIENTS]);
+
+  const handleRefreshPosts = async () => {
+    if (!slug) return;
+    const postsData = await getPosts(slug as string, true);
+    setPosts(postsData);
+  };
 
   const handleApprove = async (post: DB_Post) => {
     try {
@@ -238,7 +246,13 @@ export default function AdminPage() {
                  <h2 className="text-3xl font-black">Издательство</h2>
                  <p className="text-xs font-bold text-graphite/30 uppercase mt-1">Контент-план и публикации</p>
               </div>
-              <Button className="rounded-2xl h-14 px-8 text-md font-black gap-3 shadow-xl shadow-primary/20">
+              <Button 
+                onClick={() => {
+                  console.log("Opening PostModal...");
+                  setIsPostModalOpen(true);
+                }}
+                className="rounded-2xl h-14 px-8 text-md font-black gap-3 shadow-xl shadow-primary/20"
+              >
                  <Plus size={20} /> Создать пост
               </Button>
            </div>
@@ -490,6 +504,12 @@ export default function AdminPage() {
          client={selectedClient} 
          isOpen={!!selectedClient} 
          onClose={() => setSelectedClient(null)} 
+       />
+
+       <PostModal 
+         isOpen={isPostModalOpen}
+         onClose={() => setIsPostModalOpen(false)}
+         onSuccess={handleRefreshPosts}
        />
 
        {/* Content Area */}

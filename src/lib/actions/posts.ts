@@ -9,6 +9,7 @@ export interface DB_Post {
   category: string;
   title: string;
   excerpt: string;
+  content?: string;
   author: string;
   date: string;
   likes: number;
@@ -21,7 +22,7 @@ export interface DB_Post {
   stats_weight?: string;
   stats_waist?: string;
   expert: string;
-  status: "published" | "pending";
+  status: "published" | "pending" | "draft";
   client_id?: string;
   products?: string[];
 }
@@ -51,7 +52,7 @@ export async function getPosts(expertSlug: string, includePending = false) {
   }
 }
  
-export async function submitStoryAction(data: Omit<DB_Post, "$id" | "likes" | "comments" | "date" | "status">) {
+export async function submitStoryAction(data: Omit<DB_Post, "$id" | "likes" | "comments" | "date"> & { status?: DB_Post["status"] }) {
   try {
     const { databases } = await createAdminClient();
     const response = await databases.createDocument(
@@ -60,22 +61,28 @@ export async function submitStoryAction(data: Omit<DB_Post, "$id" | "likes" | "c
       "unique()",
       {
         ...data,
-        status: "pending",
+        status: data.status || "pending",
         likes: 0,
         comments: 0,
-        date: "Будет опубликовано",
-        isPremium: false,
+        date: data.status === "published" ? "Сегодня" : "Будет опубликовано",
+        isPremium: data.isPremium || false,
       }
     );
  
-    // Уведомление эксперта о новой истории
-    const { telegramService } = await import("@/lib/telegram/service");
-    await telegramService.sendStoryModerationNotification({
-      clientName: data.author,
-      title: data.title,
-      stats_weight: data.stats_weight,
-      stats_waist: data.stats_waist
-    }, data.expert);
+    // Уведомление эксперта о новой истории, только если это не сам эксперт постит (статус pending)
+    if (response.status === "pending") {
+      try {
+        const { telegramService } = await import("@/lib/telegram/service");
+        await telegramService.sendStoryModerationNotification({
+          clientName: data.author,
+          title: data.title,
+          stats_weight: data.stats_weight,
+          stats_waist: data.stats_waist
+        }, data.expert);
+      } catch (e) {
+        console.error("Telegram notification failed", e);
+      }
+    }
  
     return response as unknown as DB_Post;
   } catch (error) {
