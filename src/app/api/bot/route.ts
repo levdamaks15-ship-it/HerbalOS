@@ -113,32 +113,89 @@ bot.command("support", (ctx) => {
 
 bot.command("id", (ctx) => ctx.reply(`ID этого чата: ${ctx.chat.id}`));
 
+// Хранилище для обработанных ID (в памяти инстанса Vercel)
+const processedUpdates = new Set<number>();
+
+// Очистка старых ID каждые 5 минут (примерно)
+setInterval(() => processedUpdates.clear(), 1000 * 60 * 5);
+
 // Обработка текстовых сообщений через AI
 bot.on("message:text", async (ctx) => {
+  const updateId = ctx.update.update_id;
+  const chatId = String(ctx.chat.id);
+  
+  // 1. ЖЕСТКАЯ ДЕДУПЛИКАЦИЯ ЧЕРЕЗ APPWRITE
+  try {
+    const { createAdminClient } = await import("@/lib/appwrite/server");
+    const { APPWRITE_CONFIG } = await import("@/lib/appwrite/config");
+    const { Query } = await import("node-appwrite");
+    const { databases } = await createAdminClient();
+
+    // Проверяем, не обрабатывали ли мы этот updateId за последние 10 минут
+    const existing = await databases.listDocuments(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.collections.logs,
+      [Query.equal("message", [String(updateId)]), Query.equal("type", ["bot_update"])]
+    );
+
+    if (existing.documents.length > 0) {
+      console.log(`[Bot] Appwrite: Skipping duplicate update ${updateId}`);
+      return;
+    }
+
+    // Регистрируем начало обработки
+    await databases.createDocument(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.collections.logs,
+      "unique()",
+      {
+        type: "bot_update",
+        message: String(updateId),
+        userId: chatId, // Используем chatId как идентификатор
+        timestamp: new Date().toISOString()
+      }
+    );
+  } catch (dbErr) {
+    console.error("[Bot] Deduplication error:", dbErr);
+    // Если база лежит, продолжаем на свой страх и риск, но логируем
+  }
+
+  console.log(`[Bot] Processing update ${updateId} from ${ctx.from?.id}`);
+
   // Не отвечаем сами себе (эксперту)
-  if (String(ctx.chat.id) === expertChatId) return;
+  if (chatId === expertChatId) return;
 
   const userMessage = ctx.message.text;
   const clientName = ctx.from?.first_name || "Клиент";
 
-  // Показываем статус "печатает..."
-  await ctx.replyWithChatAction("typing");
-
   try {
     const { aiService } = await import("@/lib/ai/service");
-    const aiResponse = await aiService.getBotResponse(userMessage, {
+    
+    // Добавляем гонку: AI против таймаута Vercel (8 сек)
+    const aiPromise = aiService.getBotResponse(userMessage, {
       expertName: "Эксперт Гербалайф",
       clientName: clientName,
       apiKey: process.env.GOOGLE_AI_API_KEY
     });
 
+    const timeoutPromise = new Promise<string>((resolve) => 
+      setTimeout(() => resolve("TIMEOUT_REACHED"), 8500)
+    );
 
-    return ctx.reply(aiResponse);
+    const result = await Promise.race([aiPromise, timeoutPromise]);
+
+    if (result === "TIMEOUT_REACHED") {
+      console.log(`[Bot] AI is too slow for update ${updateId}, sending placeholder`);
+      return await ctx.reply("Я почти нашел ответ... Секундочку! 🌿");
+    }
+
+    return await ctx.reply(result as string);
   } catch (err) {
-    console.error("Bot AI error:", err);
-    return ctx.reply("Ваше сообщение получено. Я скоро вернусь с ответом! 🌿");
+    console.error(`[Bot] Error in update ${updateId}:`, err);
+    return await ctx.reply("Ваше сообщение получено. Я скоро вернусь с ответом! 🌿");
   }
 });
 
-
-export const POST = webhookCallback(bot, "std/http");
+export const POST = webhookCallback(bot, "std/http", {
+  timeoutMilliseconds: 9000, // Чуть меньше лимита Vercel
+});
