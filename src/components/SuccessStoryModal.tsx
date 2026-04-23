@@ -50,7 +50,7 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
   if (!post) return null;
 
   const getImageUrl = (id: string | undefined) => {
-    if (!id) return null;
+    if (!id) return undefined;
     if (id.startsWith("http") || id.startsWith("/")) return id;
     try {
       return storageService.getFilePreview(id);

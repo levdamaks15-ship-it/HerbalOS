@@ -64,7 +64,7 @@ export default function MediaPage() {
   const expertName = "Эксперт Гербалайф";
 
   const getImageUrl = (id: string | undefined) => {
-    if (!id) return null;
+    if (!id) return undefined;
     if (id.startsWith("http") || id.startsWith("/")) return id;
     try {
       return storageService.getFilePreview(id);
