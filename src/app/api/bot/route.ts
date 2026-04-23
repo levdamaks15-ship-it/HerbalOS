@@ -127,9 +127,11 @@ bot.on("message:text", async (ctx) => {
   try {
     const { aiService } = await import("@/lib/ai/service");
     const aiResponse = await aiService.getBotResponse(userMessage, {
-      expertName: "Эксперт Гербалайф", // Здесь можно будет брать динамически
-      clientName: clientName
+      expertName: "Эксперт Гербалайф",
+      clientName: clientName,
+      apiKey: process.env.GOOGLE_AI_API_KEY
     });
+
 
     return ctx.reply(aiResponse);
   } catch (err) {

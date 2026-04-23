@@ -1,10 +1,13 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const apiKey = process.env.GOOGLE_AI_API_KEY?.trim();
-const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
-
 export const aiService = {
-  async getBotResponse(userMessage: string, context: { expertName: string; clientName?: string }) {
+  async getBotResponse(userMessage: string, context: { expertName: string; clientName?: string; apiKey?: string }) {
+    const key = context.apiKey?.trim();
+    if (!key) {
+      return "Извините, мой 'мозг' (AI) сейчас не настроен (нет ключа). Пожалуйста, подождите эксперта! 🌿";
+    }
+
+    const genAI = new GoogleGenerativeAI(key);
     if (!genAI) {
       return "Извините, мой 'мозг' (AI) сейчас не настроен. Пожалуйста, подождите эксперта! 🌿";
     }
@@ -31,10 +34,11 @@ export const aiService = {
       const result = await model.generateContent(prompt);
       const response = await result.response;
       return response.text();
-    } catch (error) {
+    } catch (error: any) {
       console.error("AI Service Error:", error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      return `⚠️ Ошибка AI: ${errorMessage.substring(0, 100)}... Попробуйте позже или дождитесь наставника! 🙏`;
+      const errorStr = JSON.stringify(error, null, 2);
+      const message = error?.message || String(error);
+      return `⚠️ Ошибка AI: ${message.substring(0, 150)}... [Debug: ${errorStr.substring(0, 50)}]`;
     }
 
   }
