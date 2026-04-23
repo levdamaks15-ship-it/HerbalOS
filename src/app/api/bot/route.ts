@@ -1,4 +1,4 @@
-import { Bot, webhookCallback, InlineKeyboard } from "grammy";
+import { Bot, webhookCallback, InlineKeyboard, Keyboard } from "grammy";
 import { updateClientAction } from "@/lib/actions/clients";
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -9,6 +9,19 @@ if (!token) {
 }
 
 const bot = new Bot(token || "dummy_token");
+
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://herbalife-os.vercel.app";
+const slug = "expert";
+
+// ГЛАВНОЕ МЕНЮ (Reply Keyboard) - всегда под рукой у клиента
+const MAIN_KEYBOARD = new Keyboard()
+  .webApp("🚀 Пройти тест", `${baseUrl}/${slug}/quiz`)
+  .webApp("📊 Мой кабинет", `${baseUrl}/${slug}/dashboard`)
+  .row()
+  .webApp("📖 Media Hub", `${baseUrl}/${slug}/media`)
+  .text("💬 Помощь")
+  .resized()
+  .persistent();
 
 // Конфигурация команд и меню (вызывается один раз или принудительно через /setup)
 const setupBotUI = async () => {
@@ -25,7 +38,7 @@ const setupBotUI = async () => {
       menu_button: {
         type: "web_app",
         text: "Открыть Hub 🌿",
-        web_app: { url: "https://herbalife-os.vercel.app/expert" }
+        web_app: { url: `${baseUrl}/${slug}` }
       }
     });
     console.log("Bot UI successfully configured");
@@ -48,8 +61,8 @@ bot.command("start", async (ctx) => {
 
   if (isExpert) {
     const adminKeyboard = new InlineKeyboard()
-      .url("Открыть CRM", "https://herbalife-os.vercel.app/expert/admin").row()
-      .url("Лента Media Hub", "https://herbalife-os.vercel.app/expert/media");
+      .url("Открыть CRM", `${baseUrl}/${slug}/admin`).row()
+      .url("Лента Media Hub", `${baseUrl}/${slug}/media`);
 
     return ctx.reply(`
 💪 *Добро пожаловать, Наставник!*
@@ -69,8 +82,8 @@ bot.command("start", async (ctx) => {
     const chatId = String(ctx.chat.id);
     
     const clientKeyboard = new InlineKeyboard()
-      .url("🎁 Забрать мой подарок", "https://example.com/meal-plan.pdf").row()
-      .webApp("Открыть мой Hub 🌿", "https://herbalife-os.vercel.app/expert/dashboard");
+      .url("🎁 Забрать мой подарок", `${baseUrl}/${slug}/media`).row()
+      .webApp("Открыть мой Hub 🌿", `${baseUrl}/${slug}/dashboard`);
 
     const result = await updateClientAction(clientId, { telegram_chat_id: chatId });
     
@@ -81,7 +94,7 @@ bot.command("start", async (ctx) => {
 Я ваш персональный ассистент по питанию и дисциплине. Мы успешно связали ваш аккаунт! 
 
 🎁 *Ваш обещанный подарок:*
-Мы подготовили для вас [План питания на 7 дней](https://example.com/meal-plan.pdf), который поможет вам сделать первые шаги к цели максимально эффективно.
+Мы подготовили для вас подарок в ленте Media Hub, который поможет вам сделать первые шаги к цели максимально эффективно.
 
 📲 *Что теперь?*
 - Теперь я буду присылать вам напоминания о воде и приемах пищи.
@@ -89,26 +102,23 @@ bot.command("start", async (ctx) => {
 - Ваши результаты будут под надежным контролем!
 
 Давайте достигать целей вместе! 💪
-      `, { parse_mode: "Markdown", reply_markup: clientKeyboard });
+      `, { parse_mode: "Markdown", reply_markup: MAIN_KEYBOARD });
     }
   }
 
   // Логика для гостя (если зашел просто так)
   const chatId = String(ctx.chat.id);
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://herbalife-os.vercel.app";
   
-  const guestKeyboard = new InlineKeyboard()
-    .webApp("🚀 Пройти Wellness-тест", `${baseUrl}/expert/quiz?chat_id=${chatId}`)
-    .row()
-    .url("🌐 Открыть Media Hub", `${baseUrl}/expert/media`);
-
   return ctx.reply(`
 🌿 *Добро пожаловать в Herbal OS!*
 
 Я ваш персональный ассистент по здоровому образу жизни. Чтобы я мог подобрать для вас идеальный план питания и выдать подарок, мне нужно немного узнать о вас.
 
-Нажмите кнопку ниже, чтобы пройти быстрый *Wellness-тест*. Это займет всего 2 минуты, и вы сразу получите расшифровку своих показателей! 👇
-  `, { parse_mode: "Markdown", reply_markup: guestKeyboard });
+Нажмите кнопку ниже, чтобы пройти быстрый *Wellness-тест*. Это займет всего 2 минуты! 👇
+  `, { 
+    parse_mode: "Markdown", 
+    reply_markup: MAIN_KEYBOARD 
+  });
 });
 
 // Быстрые ссылки
@@ -182,6 +192,13 @@ bot.on("message:text", async (ctx) => {
 
   const userMessage = ctx.message.text;
   const clientName = ctx.from?.first_name || "Клиент";
+
+  // Обработка кнопки "Помощь" из меню
+  if (userMessage === "💬 Помощь") {
+    const { telegramService } = await import("@/lib/telegram/service");
+    await telegramService.sendSupportRequest(clientName, "Клиент нажал кнопку ПОМОЩЬ в меню", chatId, slug);
+    return await ctx.reply("Понял тебя! Уже зову наставника на помощь. 💪 Он скоро подключится и ответит в этом чате. 🌿");
+  }
 
   try {
     const { aiService } = await import("@/lib/ai/service");
