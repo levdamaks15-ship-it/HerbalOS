@@ -211,7 +211,7 @@ bot.on("message:text", async (ctx) => {
       aiResponse = aiResponse.replace("[CALL_MENTOR]", "").trim();
       
       const { telegramService } = await import("@/lib/telegram/service");
-      await telegramService.sendSupportRequest(clientName, userMessage, chatId);
+      await telegramService.sendSupportRequest(clientName, userMessage, chatId, slug);
       console.log(`[Bot] Support request sent for update ${updateId}`);
     }
 

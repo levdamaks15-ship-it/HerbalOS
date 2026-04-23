@@ -44,7 +44,7 @@ export const telegramService = {
 
     const buttons = [];
     if (data.clientId) {
-      buttons.push([{ text: "🔗 Открыть в CRM", url: `${BASE_URL}/${expertSlug}/admin/clients/${data.clientId}` }]);
+      buttons.push([{ text: "🔗 Открыть в CRM", url: `${BASE_URL}/${expertSlug}/admin?client=${data.clientId}` }]);
     } else {
       buttons.push([{ text: "🔗 Открыть CRM", url: `${BASE_URL}/${expertSlug}/admin` }]);
     }
@@ -118,7 +118,7 @@ export const telegramService = {
 `;
 
     const url = clientId 
-      ? `${BASE_URL}/${expertSlug}/admin/clients/${clientId}`
+      ? `${BASE_URL}/${expertSlug}/admin?client=${clientId}`
       : `${BASE_URL}/${expertSlug}/admin`;
 
     try {
@@ -189,7 +189,7 @@ ${message}
   },
 
   // Уведомление эксперта о том, что нужен "живой" ответ
-  async sendSupportRequest(clientName: string, userMessage: string, userChatId: string) {
+  async sendSupportRequest(clientName: string, userMessage: string, userChatId: string, expertSlug: string) {
     if (!bot) return;
     const adminChatId = process.env.TELEGRAM_LEADS_CHAT_ID;
     if (!adminChatId) return;
@@ -209,6 +209,7 @@ ${message}
         parse_mode: "Markdown",
         reply_markup: {
           inline_keyboard: [
+            [{ text: "🔗 Открыть в CRM", url: `${BASE_URL}/${expertSlug}/admin?client=${userChatId}` }],
             [{ text: "💬 Перейти к диалогу", url: `tg://user?id=${userChatId}` }]
           ]
         }

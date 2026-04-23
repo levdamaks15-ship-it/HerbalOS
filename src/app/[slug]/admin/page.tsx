@@ -33,7 +33,7 @@ import {
   approvePostAction, 
   deletePostAction 
 } from "@/lib/actions/posts";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { ClientDetail } from "@/components/ClientDetail";
 import { authService } from "@/lib/appwrite/services/auth";
 import { loginAction, logoutAction, getCurrentUserAction } from "@/lib/actions/auth";
@@ -122,6 +122,8 @@ export default function AdminPage() {
     }
   ], [slug]);
 
+  const searchParams = useSearchParams();
+
   useEffect(() => {
     async function loadAdminData() {
       if (!slug) return;
@@ -135,6 +137,21 @@ export default function AdminPage() {
     }
     loadAdminData();
   }, [slug, DEMO_CLIENTS]);
+
+  // Автоматическое открытие карточки клиента по ID из URL
+  useEffect(() => {
+    const clientId = searchParams.get("client");
+    if (clientId && clients.length > 0) {
+      const client = clients.find(c => c.$id === clientId || c.telegram_chat_id === clientId);
+      if (client) {
+        setSelectedClient(client);
+        // Если клиент найден, переключаемся на вкладку "Все", чтобы не было путаницы
+        if (client.status !== "at_risk") {
+          setActiveTab("all");
+        }
+      }
+    }
+  }, [searchParams, clients]);
 
   const handleRefreshPosts = async () => {
     if (!slug) return;
