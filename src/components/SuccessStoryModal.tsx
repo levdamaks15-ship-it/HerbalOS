@@ -98,9 +98,19 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
             </div>
 
             <div className="flex-1 overflow-y-auto no-scrollbar pb-24">
-               {/* Hero Section: Comparison */}
+               {/* Hero Section: Comparison or Single Image */}
                <div className="relative aspect-square sm:aspect-video w-full bg-graphite">
-                  {post.imageBefore === post.imageAfter ? (
+                  {post.type === "standard" || (post.image && !post.imageBefore && !post.imageAfter) ? (
+                     <div className="relative h-full w-full overflow-hidden group bg-linear-to-br from-primary/20 via-primary/5 to-white flex items-center justify-center">
+                        {getImageUrl(post.image) ? (
+                           // eslint-disable-next-line @next/next/no-img-element
+                           <img src={getImageUrl(post.image)!} alt={post.title} className="w-full h-full object-cover transform transition-transform duration-[2s] group-hover:scale-105" />
+                        ) : (
+                           <Sparkles size={64} className="text-primary opacity-20" />
+                        )}
+                        <div className="absolute inset-0 bg-linear-to-t from-graphite via-transparent to-graphite/20 opacity-60" />
+                     </div>
+                  ) : post.imageBefore === post.imageAfter ? (
                      <div className="relative h-full w-full overflow-hidden group bg-linear-to-br from-primary/20 via-primary/5 to-white flex items-center justify-center">
                         {getImageUrl(post.imageAfter) ? (
                            // eslint-disable-next-line @next/next/no-img-element
@@ -123,7 +133,7 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                         </div>
                         <div className="relative overflow-hidden group">
                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                           <img src={getImageUrl(post.imageAfter)} alt="After" className="w-full h-full object-cover object-center transform transition-transform duration-1000 group-hover:scale-105" />
+                           <img src={getImageUrl(post.imageAfter) || "/assets/placeholder.png"} alt="After" className="w-full h-full object-cover object-center transform transition-transform duration-1000 group-hover:scale-105" />
                            <div className="absolute top-1/2 right-8 -translate-y-1/2 flex flex-col items-center gap-4">
                               <div className="w-px h-24 bg-linear-to-b from-transparent via-primary/50 to-transparent" />
                               <div className="bg-primary text-white px-6 py-2 rounded-2xl text-[12px] font-black uppercase shadow-xl tracking-widest">После</div>
