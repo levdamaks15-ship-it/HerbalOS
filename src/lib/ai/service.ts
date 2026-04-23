@@ -21,11 +21,12 @@ export const aiService = {
     }
 
     try {
-      // 2.0 Flash обычно быстрее
-      return await fetchAI("gemini-2.0-flash");
+      // Возвращаемся к самой стабильной модели
+      return await fetchAI("gemini-flash-latest");
     } catch (e: any) {
       try {
-        return await fetchAI("gemini-flash-latest");
+        // Если основная лежит, пробуем 2.0
+        return await fetchAI("gemini-2.0-flash");
       } catch (fallbackError: any) {
         return `⚠️ Ошибка: ${fallbackError.message}`;
       }
