@@ -33,7 +33,9 @@ export const aiService = {
       return response.text();
     } catch (error) {
       console.error("AI Service Error:", error);
-      return "Ой, что-то пошло не так в моих мыслях... Попробуйте чуть позже или дождитесь наставника! 🙏";
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return `⚠️ Ошибка AI: ${errorMessage.substring(0, 100)}... Попробуйте позже или дождитесь наставника! 🙏`;
     }
+
   }
 };
