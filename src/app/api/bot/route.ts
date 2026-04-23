@@ -27,10 +27,11 @@ const MAIN_KEYBOARD = new Keyboard()
 const setupBotUI = async () => {
   try {
     await bot.api.setMyCommands([
-      { command: "start", description: "Запустить бота и получить подарок" },
-      { command: "hub", description: "Открыть экспертную платформу" },
-      { command: "community", description: "Наше сообщество в Telegram" },
-      { command: "support", description: "Связаться с наставником" },
+      { command: "start", description: "Главное меню" },
+      { command: "quiz", description: "Пройти Wellness-тест 🚀" },
+      { command: "dashboard", description: "Мой личный кабинет 📊" },
+      { command: "media", description: "Лента Media Hub 📖" },
+      { command: "support", description: "Позвать наставника 💬" },
     ]);
     
     // Настройка кнопки меню (слева от ввода)
@@ -51,7 +52,31 @@ const setupBotUI = async () => {
 bot.command("setup", async (ctx) => {
   if (String(ctx.chat.id) !== expertChatId) return;
   await setupBotUI();
-  await ctx.reply("✅ Интерфейс бота (меню и команды) успешно обновлен!");
+  await ctx.reply("✅ Список команд и меню бота успешно обновлены!");
+});
+
+// Новые команды-дублеры
+bot.command("quiz", (ctx) => {
+  const keyboard = new InlineKeyboard().webApp("🚀 Запустить тест", `${baseUrl}/${slug}/quiz?chat_id=${ctx.chat.id}`);
+  return ctx.reply("Нажмите кнопку ниже, чтобы начать Wellness-тест:", { reply_markup: keyboard });
+});
+
+bot.command("dashboard", (ctx) => {
+  const keyboard = new InlineKeyboard().webApp("📊 Открыть кабинет", `${baseUrl}/${slug}/dashboard`);
+  return ctx.reply("Ваш личный кабинет с результатами и программой:", { reply_markup: keyboard });
+});
+
+bot.command("media", (ctx) => {
+  const keyboard = new InlineKeyboard().url("📖 Открыть Media Hub", `${baseUrl}/${slug}/media`);
+  return ctx.reply("Полезные статьи, рецепты и советы от наставника:", { reply_markup: keyboard });
+});
+
+bot.command("support", async (ctx) => {
+  const clientName = ctx.from?.first_name || "Клиент";
+  const chatId = String(ctx.chat.id);
+  const { telegramService } = await import("@/lib/telegram/service");
+  await telegramService.sendSupportRequest(clientName, "Клиент вызвал помощь через команду /support", chatId, slug);
+  return ctx.reply("Уже зову наставника! 💪 Он скоро подключится к чату. 🌿");
 });
 
 // Обработка команды /start
