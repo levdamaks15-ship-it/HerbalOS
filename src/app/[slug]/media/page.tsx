@@ -78,7 +78,6 @@ export default function MediaPage() {
       if (!slug) return;
       try {
         const data = await getPosts(slug as string);
-        console.log("POSTS DATA FROM DB:", data);
         setPosts(data || []);
       } catch (error) {
         console.error("Failed to load posts:", error);
@@ -221,7 +220,6 @@ export default function MediaPage() {
                                    src={getImageUrl(post.image)!} 
                                    alt={post.title} 
                                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                                   onError={(e) => console.error("IMAGE LOAD ERROR for " + post.title, e)}
                                  />
                                ) : (
                                  <div className="flex flex-col items-center gap-4 opacity-20">
