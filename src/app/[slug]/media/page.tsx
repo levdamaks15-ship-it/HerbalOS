@@ -8,6 +8,7 @@ import {
   Heart, 
   Sparkles
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -17,46 +18,46 @@ import { getPosts, DB_Post } from "@/lib/actions/posts";
 import { SuccessStoryModal } from "@/components/SuccessStoryModal";
 import { storageService } from "@/lib/appwrite/services/storage";
 
-const FALLBACK_POSTS: Partial<DB_Post>[] = [
-  {
-    $id: "demo-1",
-    title: "5 секретов идеального завтрака с Herbalife",
-    excerpt: "Как начать день правильно, чтобы энергии хватило до самого вечера? Разбираем состав и пользу коктейля Формула 1.",
-    image: "/assets/breakfast.png",
-    category: "Питание",
-    type: "standard",
-    date: "Сегодня",
-    likes: 124,
-    isPremium: true,
-    author: "Expert",
-    comments: 12,
-    expert: "vadim",
-    status: "published"
-  },
-  {
-    $id: "demo-2",
-    title: "Результат Кирилла: -12кг за 3 месяца",
-    excerpt: "История невероятной трансформации и изменения привычек питания под руководством эксперта.",
-    imageBefore: "/assets/transformation.png",
-    imageAfter: "/assets/transformation.png",
-    category: "Результаты",
-    type: "result",
-    stats_weight: "-12.4 кг",
-    stats_waist: "-15 см",
-    date: "Вчера",
-    likes: 450,
-    author: "Expert",
-    comments: 48,
-    expert: "vadim",
-    status: "published",
-    products: ["Коктейль Ф1", "Алоэ", "Травяной напиток"]
-  }
-];
-
 const CATEGORIES = ["Все", "Питание", "Рецепты", "Результаты", "Статьи"];
 
 export default function MediaPage() {
   const { slug } = useParams();
+
+  const FALLBACK_POSTS: Partial<DB_Post>[] = [
+    {
+      $id: "demo-1",
+      title: "5 секретов идеального завтрака с Herbalife",
+      excerpt: "Как начать день правильно, чтобы энергии хватило до самого вечера? Разбираем состав и пользу коктейля Формула 1.",
+      image: "/assets/breakfast.png",
+      category: "Питание",
+      type: "standard",
+      date: "Сегодня",
+      likes: 124,
+      isPremium: true,
+      author: "Expert",
+      comments: 12,
+      expert: slug as string,
+      status: "published"
+    },
+    {
+      $id: "demo-2",
+      title: "Результат Кирилла: -12кг за 3 месяца",
+      excerpt: "История невероятной трансформации и изменения привычек питания под руководством эксперта.",
+      imageBefore: "/assets/transformation.png",
+      imageAfter: "/assets/transformation.png",
+      category: "Результаты",
+      type: "result",
+      stats_weight: "-12.4 кг",
+      stats_waist: "-15 см",
+      date: "Вчера",
+      likes: 450,
+      author: "Expert",
+      comments: 48,
+      expert: slug as string,
+      status: "published",
+      products: ["Коктейль Ф1", "Алоэ", "Травяной напиток"]
+    }
+  ];
   const [activeCategory, setActiveCategory] = useState("Все");
   const [posts, setPosts] = useState<DB_Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -68,7 +69,7 @@ export default function MediaPage() {
     if (id.startsWith("http") || id.startsWith("/")) return id;
     try {
       return storageService.getFilePreview(id);
-    } catch (e) {
+    } catch {
       return "/assets/placeholder.png";
     }
   };
@@ -166,20 +167,38 @@ export default function MediaPage() {
                               <div className="relative aspect-square sm:aspect-video bg-white/5 overflow-hidden">
                                  {post.imageBefore === post.imageAfter ? (
                                     <div className="relative h-full w-full">
-                                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                                       <img src={getImageUrl(post.imageAfter) || "/assets/placeholder.png"} alt="Transformation" className="w-full h-full object-cover" />
+
+                                       <Image 
+                                          src={getImageUrl(post.imageAfter) || "/assets/placeholder.png"} 
+                                          alt="Transformation" 
+                                          fill
+                                          className="object-cover" 
+                                          unoptimized
+                                        />
                                        <div className="absolute inset-0 bg-linear-to-t from-graphite via-transparent to-transparent opacity-60" />
                                     </div>
                                  ) : (
                                     <div className="grid grid-cols-2 h-full gap-px bg-white/10">
                                        <div className="relative overflow-hidden">
-                                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                                          <img src={getImageUrl(post.imageBefore) || "/assets/placeholder.png"} alt="Before" className="w-full h-full object-cover object-center" />
+
+                                          <Image 
+                                              src={getImageUrl(post.imageBefore) || "/assets/placeholder.png"} 
+                                              alt="Before" 
+                                              fill
+                                              className="object-cover object-center" 
+                                              unoptimized
+                                           />
                                           <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-md text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase border border-white/10">До</div>
                                        </div>
                                        <div className="relative overflow-hidden">
-                                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                                          <img src={getImageUrl(post.imageAfter) || "/assets/placeholder.png"} alt="After" className="w-full h-full object-cover object-center" />
+
+                                          <Image 
+                                              src={getImageUrl(post.imageAfter) || "/assets/placeholder.png"} 
+                                              alt="After" 
+                                              fill
+                                              className="object-cover object-center" 
+                                              unoptimized
+                                           />
                                           <div className="absolute top-6 right-6 bg-primary text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase shadow-lg">После</div>
                                        </div>
                                     </div>
@@ -216,10 +235,12 @@ export default function MediaPage() {
                         <CardContent className="p-0 space-y-6">
                            <div className="relative rounded-[40px] overflow-hidden aspect-16/10 shadow-2xl bg-linear-to-br from-primary/20 via-primary/5 to-white flex items-center justify-center">
                                {getImageUrl(post.image) ? (
-                                 <img 
+                                 <Image 
                                    src={getImageUrl(post.image)!} 
                                    alt={post.title} 
-                                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                                   fill
+                                   className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                                   unoptimized
                                  />
                                ) : (
                                  <div className="flex flex-col items-center gap-4 opacity-20">
@@ -238,8 +259,6 @@ export default function MediaPage() {
     
                            <div className="px-4 space-y-3">
                               <div className="flex items-center gap-4 text-[11px] font-black text-graphite/30 uppercase tracking-[0.2em]">
-                                 <span>{post.date}</span>
-                                 <span className="w-1.5 h-1.5 rounded-full bg-primary/30" />
                                  <div className="flex items-center gap-1.5 text-primary"><Heart size={12} className="fill-current" /> {post.likes}</div>
                               </div>
                               <h3 className="text-3xl font-black tracking-tight leading-tight group-hover:text-primary transition-colors">{post.title}</h3>
@@ -256,7 +275,7 @@ export default function MediaPage() {
 
       <footer className="py-12 text-center border-t border-graphite/5 bg-white">
          <div className="text-primary text-2xl font-black italic tracking-tighter mb-4">Herbal OS</div>
-         <p className="text-[10px] font-bold text-graphite/30 uppercase tracking-[0.3em]">Professional Expert Portal • 2024</p>
+         <p className="text-[10px] font-bold text-graphite/30 uppercase tracking-[0.3em]">Professional Expert Portal</p>
       </footer>
 
       <SuccessStoryModal 

@@ -10,11 +10,22 @@ import { EcosystemHub } from "@/components/EcosystemHub";
 import { FloatingTelegram } from "@/components/FloatingTelegram";
 import { ResultsShowcase } from "@/components/ResultsShowcase";
 import { useAuth } from "@/components/AuthProvider";
+import { getExpertAction, DB_Expert } from "@/lib/actions/experts";
+import { storageService } from "@/lib/appwrite/services/storage";
+import Image from "next/image";
 
 export default function ExpertPortalPage() {
   const { slug } = useParams();
   const { logout } = useAuth();
-  const expertName = "Эксперт Гербалайф";
+  const [expert, setExpert] = React.useState<DB_Expert | null>(null);
+
+  React.useEffect(() => {
+    getExpertAction(slug as string).then(setExpert);
+  }, [slug]);
+
+  const expertName = expert?.name || "Эксперт Гербалайф";
+  const expertDescription = expert?.description || "Ваше здоровье — это моя профессия. Основываясь на моем 30-летнем опыте, мы не просто считаем калории, а строим фундамент для долгой и активной жизни.";
+  const expertPhoto = expert?.photo ? (expert.photo.startsWith("http") ? expert.photo : storageService.getFilePreview(expert.photo)) : "/assets/expert.png";
 
   return (
     <div className="min-h-screen text-graphite overflow-x-hidden font-outfit selection:bg-primary/20">
@@ -29,10 +40,15 @@ export default function ExpertPortalPage() {
                   <motion.div 
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="w-32 h-32 rounded-[40px] bg-primary/10 flex items-center justify-center border-4 border-white shadow-2xl overflow-hidden"
+                    className="w-32 h-32 rounded-[40px] bg-primary/10 flex items-center justify-center border-4 border-white shadow-2xl overflow-hidden relative"
                   >
-                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                     <img src="/assets/expert.png" alt="Expert" className="w-full h-full object-cover" />
+                     <Image 
+                       src={expertPhoto} 
+                       alt={expertName} 
+                       fill
+                       className="object-cover" 
+                       unoptimized
+                     />
                   </motion.div>
                  <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-primary rounded-full border-4 border-white flex items-center justify-center text-white shadow-lg">
                     <Sparkles size={18} />
@@ -47,7 +63,7 @@ export default function ExpertPortalPage() {
                  </div>
                   <p className="text-sm font-bold text-graphite/30 uppercase tracking-normal mb-4">Эксперт по питанию и трансформации</p>
                   <p className="text-base leading-relaxed text-graphite/70 font-medium max-w-xl italic">
-                     &ldquo;Ваше здоровье — это моя профессия. Основываясь на моем <b>30-летнем опыте</b>, мы не просто считаем калории, а строим фундамент для долгой и активной жизни.&rdquo;
+                     &ldquo;{expertDescription}&rdquo;
                   </p>
                </div>
             </div>

@@ -25,7 +25,7 @@ export async function getClients(expertSlug: string) {
       APPWRITE_CONFIG.databaseId,
       APPWRITE_CONFIG.collections.clients,
       [
-        Query.equal("expert", expertSlug),
+        Query.equal("expert", expertSlug === "expert" ? ["expert", "vadim"] : expertSlug),
         Query.orderDesc("$updatedAt")
       ]
     );

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { useAuth } from "./AuthProvider";
 
-export function LogoutButton({ slug }: { slug: string }) {
+export function LogoutButton() {
   const { logout } = useAuth();
 
   return (

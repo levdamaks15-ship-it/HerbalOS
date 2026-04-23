@@ -19,7 +19,8 @@ import {
   LogOut,
   Newspaper,
   Lock,
-  BookOpen
+  BookOpen,
+  Pencil
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { ClientDetail } from "@/components/ClientDetail";
 import { authService } from "@/lib/appwrite/services/auth";
+import { loginAction, logoutAction, getCurrentUserAction } from "@/lib/actions/auth";
 import { PostModal } from "@/components/PostModal";
 
 export default function AdminPage() {
@@ -50,10 +52,11 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState<DB_Client | null>(null);
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<DB_Post | null>(null);
 
   useEffect(() => {
     async function checkSession() {
-      const user = await authService.getCurrentUser();
+      const user = await getCurrentUserAction();
       if (user) {
         setIsAuthenticated(true);
       }
@@ -167,8 +170,14 @@ export default function AdminPage() {
     e.preventDefault();
     setIsAuthLoading(true);
     try {
-       await authService.login(email, password);
-       setIsAuthenticated(true);
+       await logoutAction();
+       const result = await loginAction(email, password);
+       if (result.success) {
+          setIsAuthenticated(true);
+          router.refresh();
+       } else {
+          alert("Ошибка авторизации. Проверьте данные.");
+       }
     } catch {
        alert("Ошибка авторизации. Проверьте данные.");
     } finally {
@@ -177,9 +186,14 @@ export default function AdminPage() {
   };
 
   const handleLogout = async () => {
-    await authService.logout();
+    try {
+      await logoutAction();
+      await authService.logout();
+    } catch (e) {
+      console.error(e);
+    }
     setIsAuthenticated(false);
-    router.push(`/${slug}`);
+    window.location.href = `/${slug}`;
   };
 
   const riskClients = clients.filter(c => c.status === "at_risk");
@@ -199,7 +213,7 @@ export default function AdminPage() {
               </div>
               <div>
                 <h1 className="text-3xl font-black uppercase ">Admin <span className="text-primary italic">Terminal</span></h1>
-                <p className="text-[10px] text-graphite/30 font-black uppercase  mt-2">Вход для эксперта ({slug})</p>
+                <p className="text-[10px] text-graphite/30 font-black uppercase  mt-2">Вход для эксперта</p>
               </div>
               <form onSubmit={handleLogin} className="space-y-4">
                   <input 
@@ -319,6 +333,17 @@ export default function AdminPage() {
                                           <CheckCircle size={14} /> Одобрить
                                         </Button>
                                       )}
+                                      <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        onClick={() => {
+                                          setEditingPost(post);
+                                          setIsPostModalOpen(true);
+                                        }}
+                                        className="rounded-xl w-9 h-9 hover:bg-primary/10 hover:text-primary"
+                                      >
+                                        <Pencil size={16} />
+                                      </Button>
                                       <Button 
                                         variant="ghost" 
                                         size="icon" 
@@ -507,9 +532,14 @@ export default function AdminPage() {
        />
 
        <PostModal 
+         key={editingPost?.$id || (isPostModalOpen ? "new" : "none")}
          isOpen={isPostModalOpen}
-         onClose={() => setIsPostModalOpen(false)}
+         onClose={() => {
+           setIsPostModalOpen(false);
+           setEditingPost(null);
+         }}
          onSuccess={handleRefreshPosts}
+         initialData={editingPost || undefined}
        />
 
        {/* Content Area */}

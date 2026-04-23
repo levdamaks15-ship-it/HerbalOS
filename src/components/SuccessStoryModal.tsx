@@ -14,6 +14,7 @@ import {
   Flame,
   ChevronRight
 } from "lucide-react";
+import Image from "next/image";
 import { Button } from "./ui/button";
 import { DB_Post } from "@/lib/actions/posts";
 import { cn } from "@/lib/utils";
@@ -23,7 +24,6 @@ interface SuccessStoryModalProps {
   post: DB_Post | null;
   isOpen: boolean;
   onClose: () => void;
-  expertSlug: string;
 }
 
 const PRODUCT_DATA: Record<string, { icon: React.ReactNode, color: string, image?: string }> = {
@@ -46,7 +46,7 @@ const PRODUCT_DATA: Record<string, { icon: React.ReactNode, color: string, image
   }
 };
 
-export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: SuccessStoryModalProps) {
+export function SuccessStoryModal({ post, isOpen, onClose }: SuccessStoryModalProps) {
   if (!post) return null;
 
   const getImageUrl = (id: string | undefined) => {
@@ -54,7 +54,7 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
     if (id.startsWith("http") || id.startsWith("/")) return id;
     try {
       return storageService.getFilePreview(id);
-    } catch (e) {
+    } catch {
       return "/assets/placeholder.png";
     }
   };
@@ -105,8 +105,13 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                   {post.type === "standard" || (post.image && !post.imageBefore && !post.imageAfter) ? (
                      <div className="relative h-full w-full overflow-hidden group bg-linear-to-br from-primary/20 via-primary/5 to-white flex items-center justify-center">
                         {getImageUrl(post.image) ? (
-                           // eslint-disable-next-line @next/next/no-img-element
-                           <img src={getImageUrl(post.image)!} alt={post.title} className="w-full h-full object-cover transform transition-transform duration-[2s] group-hover:scale-105" />
+                           <Image 
+                             src={getImageUrl(post.image)!} 
+                             alt={post.title} 
+                             fill
+                             className="object-cover transform transition-transform duration-[2s] group-hover:scale-105" 
+                             unoptimized
+                           />
                         ) : (
                            <Sparkles size={64} className="text-primary opacity-20" />
                         )}
@@ -115,8 +120,13 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                   ) : post.imageBefore === post.imageAfter ? (
                      <div className="relative h-full w-full overflow-hidden group bg-linear-to-br from-primary/20 via-primary/5 to-white flex items-center justify-center">
                         {getImageUrl(post.imageAfter) ? (
-                           // eslint-disable-next-line @next/next/no-img-element
-                           <img src={getImageUrl(post.imageAfter)!} alt="Transformation" className="w-full h-full object-cover transform transition-transform duration-[2s] group-hover:scale-105" />
+                           <Image 
+                             src={getImageUrl(post.imageAfter)!} 
+                             alt="Transformation" 
+                             fill
+                             className="object-cover transform transition-transform duration-[2s] group-hover:scale-105" 
+                             unoptimized
+                           />
                         ) : (
                            <Sparkles size={64} className="text-primary opacity-20" />
                         )}
@@ -125,8 +135,13 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                   ) : (
                      <div className="absolute inset-0 grid grid-cols-2 gap-px bg-white/5">
                         <div className="relative overflow-hidden group">
-                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                           <img src={getImageUrl(post.imageBefore) || "/assets/placeholder.png"} alt="Before" className="w-full h-full object-cover object-center transform transition-transform duration-1000 group-hover:scale-105" />
+                           <Image 
+                             src={getImageUrl(post.imageBefore) || "/assets/placeholder.png"} 
+                             alt="Before" 
+                             fill
+                             className="object-cover object-center transform transition-transform duration-1000 group-hover:scale-105" 
+                             unoptimized
+                           />
                            <div className="absolute top-1/2 left-8 -translate-y-1/2 flex flex-col items-center gap-4">
                               <div className="w-px h-24 bg-linear-to-b from-transparent via-white/50 to-transparent" />
                               <div className="bg-black/60 backdrop-blur-md text-white px-6 py-2 rounded-2xl text-[12px] font-black uppercase border border-white/10 tracking-widest">До</div>
@@ -134,8 +149,13 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                            </div>
                         </div>
                         <div className="relative overflow-hidden group">
-                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                           <img src={getImageUrl(post.imageAfter) || "/assets/placeholder.png"} alt="After" className="w-full h-full object-cover object-center transform transition-transform duration-1000 group-hover:scale-105" />
+                           <Image 
+                             src={getImageUrl(post.imageAfter) || "/assets/placeholder.png"} 
+                             alt="After" 
+                             fill
+                             className="object-cover object-center transform transition-transform duration-1000 group-hover:scale-105" 
+                             unoptimized
+                           />
                            <div className="absolute top-1/2 right-8 -translate-y-1/2 flex flex-col items-center gap-4">
                               <div className="w-px h-24 bg-linear-to-b from-transparent via-primary/50 to-transparent" />
                               <div className="bg-primary text-white px-6 py-2 rounded-2xl text-[12px] font-black uppercase shadow-xl tracking-widest">После</div>
@@ -161,7 +181,7 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                                 <TrendingDown size={18} />
                                 <span className="text-[10px] font-black uppercase tracking-widest">Сброс веса</span>
                              </div>
-                             <div className="text-5xl font-black italic tracking-tighter text-graphite group-hover:scale-110 transition-transform origin-left">{post.stats_weight}</div>
+                              <div className="text-3xl font-black italic tracking-tighter text-graphite group-hover:scale-105 transition-transform origin-left">{post.stats_weight}</div>
                           </div>
                           <TrendingDown className="absolute -right-4 -bottom-4 w-32 h-32 text-primary/5 -rotate-12" />
                        </div>
@@ -171,7 +191,7 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                                 <Target size={18} />
                                 <span className="text-[10px] font-black uppercase tracking-widest">Объемы ушли</span>
                              </div>
-                             <div className="text-5xl font-black italic tracking-tighter text-graphite group-hover:scale-110 transition-transform origin-left">{post.stats_waist}</div>
+                              <div className="text-3xl font-black italic tracking-tighter text-graphite group-hover:scale-105 transition-transform origin-left">{post.stats_waist}</div>
                           </div>
                           <Target className="absolute -right-4 -bottom-4 w-32 h-32 text-primary/5 rotate-12" />
                        </div>
@@ -221,8 +241,15 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                                 >
                                    <div className={cn("w-32 h-32 rounded-3xl flex items-center justify-center overflow-hidden transition-all group-hover:scale-110", data.color)}>
                                       {data.image ? (
-                                         // eslint-disable-next-line @next/next/no-img-element
-                                         <img src={data.image} alt={productName} className="w-full h-full object-cover" />
+
+                                         <div className="relative w-full h-full">
+                                            <Image 
+                                              src={data.image} 
+                                              alt={productName} 
+                                              fill
+                                              className="object-cover" 
+                                            />
+                                          </div>
                                       ) : (
                                          <div className="scale-150">{data.icon}</div>
                                       )}
@@ -230,9 +257,7 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                                    <div>
                                       <div className="text-sm font-black text-graphite line-clamp-2">{productName}</div>
                                    </div>
-                                   <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                      <Button variant="ghost" size="sm" className="text-[10px] font-black uppercase text-primary p-0 h-auto">Купить <ChevronRight size={12} /></Button>
-                                   </div>
+
                                 </motion.div>
                               );
                            })}
@@ -242,20 +267,7 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                </div>
             </div>
 
-            {/* Action Footer */}
-            {/* Action Footer - Only for Results */}
-            {post.type === "result" && (
-              <div className="p-8 sm:p-12 bg-white/80 backdrop-blur-md border-t border-graphite/5 flex flex-col sm:flex-row items-center justify-between gap-8">
-                 <div className="space-y-1 text-center sm:text-left">
-                    <div className="text-[10px] font-black uppercase tracking-widest text-primary">Готовы начать свой путь?</div>
-                    <div className="text-xl font-black text-graphite">Получите персональную программу</div>
-                 </div>
-                 <Button className="w-full sm:w-auto h-20 px-12 rounded-[28px] bg-primary text-white shadow-xl shadow-primary/30 flex items-center justify-center gap-4 text-lg font-black group overflow-hidden relative">
-                    <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:animate-shimmer" />
-                    Хочу такой же результат <ArrowRight size={24} />
-                 </Button>
-              </div>
-            )}
+
           </motion.div>
         </div>
       )}

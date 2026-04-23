@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getPosts } from "@/lib/actions/posts";
+import { storageService } from "@/lib/appwrite/services/storage";
 import { 
   ArrowRight, 
-  Scale, 
   Timer, 
   Ruler, 
   Trophy,
@@ -105,15 +106,15 @@ const CaseCard = ({ item, slug }: { item: ResultCase; slug: string }) => {
         </div>
 
         {/* Name & Quick Stats */}
-        <div className="absolute inset-x-0 bottom-0 p-5 z-20">
-           <h4 className="text-lg font-bold text-white mb-1">{item.name}</h4>
-           <div className="flex gap-3">
-              <div className="flex items-center gap-1 text-white/50 text-[9px] font-bold uppercase tracking-wider">
-                 <Timer size={10} className="text-primary" /> {item.duration}
+        <div className="absolute inset-x-0 bottom-0 p-5 z-20 pr-20">
+           <h4 className="text-lg font-bold text-white mb-1 truncate">{item.name}</h4>
+           <div className="flex flex-wrap gap-x-3 gap-y-1">
+              <div className="flex items-center gap-1 text-white/50 text-[9px] font-bold uppercase tracking-wider whitespace-nowrap">
+                 <Timer size={10} className="text-primary shrink-0" /> {item.duration}
               </div>
               {item.waist && (
-                <div className="flex items-center gap-1 text-white/50 text-[9px] font-bold uppercase tracking-wider">
-                   <Ruler size={10} className="text-primary" /> {item.waist}
+                <div className="flex items-center gap-1 text-white/50 text-[9px] font-bold uppercase tracking-wider whitespace-nowrap">
+                   <Ruler size={10} className="text-primary shrink-0" /> {item.waist}
                 </div>
               )}
            </div>
@@ -137,6 +138,33 @@ const CaseCard = ({ item, slug }: { item: ResultCase; slug: string }) => {
 };
 
 export function ResultsShowcase({ slug }: { slug: string }) {
+  const [cases, setCases] = useState<ResultCase[]>(TEST_CASES);
+
+  useEffect(() => {
+    getPosts(slug).then(posts => {
+      const resultPosts = posts.filter(p => p.type === "result");
+      if (resultPosts.length > 0) {
+        const mappedCases = resultPosts.map(p => {
+          // Пытаемся вытащить чистый текст без HTML тегов
+          const rawQuote = p.excerpt || p.content || "";
+          const cleanQuote = rawQuote.replace(/<[^>]*>?/gm, '');
+          
+          return {
+            id: p.$id,
+            name: p.title,
+            loss: p.stats_weight || "",
+            duration: new Date(p.$createdAt).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }),
+            waist: p.stats_waist,
+            quote: cleanQuote,
+            imageBefore: p.imageBefore ? storageService.getFilePreview(p.imageBefore) : "/assets/transformation.png",
+            imageAfter: p.imageAfter ? storageService.getFilePreview(p.imageAfter) : "/assets/transformation.png"
+          };
+        });
+        setCases(mappedCases);
+      }
+    });
+  }, [slug]);
+
   return (
     <section className="mt-4 bg-[#121418] text-white py-10 px-6 rounded-[40px] mx-4 sm:mx-6 shadow-3xl relative">
       {/* Background decoration */}
@@ -157,7 +185,7 @@ export function ResultsShowcase({ slug }: { slug: string }) {
 
       {/* Horizontal Scroll Container */}
       <div className="flex gap-4 overflow-x-scroll no-scrollbar pb-6 pt-2 px-6 snap-x snap-mandatory relative z-10 -mx-6 touch-pan-x select-none">
-        {TEST_CASES.map((item) => (
+        {cases.map((item) => (
           <div key={item.id} className="snap-start shrink-0">
             <CaseCard item={item} slug={slug} />
           </div>

@@ -31,7 +31,7 @@ export async function getPosts(expertSlug: string, includePending = false) {
   try {
     const { databases } = await createAdminClient();
     const queries = [
-      Query.equal("expert", expertSlug),
+      Query.equal("expert", expertSlug === "expert" ? ["expert", "vadim"] : expertSlug),
       Query.orderDesc("$createdAt")
     ];
  
@@ -125,6 +125,28 @@ export async function deletePostAction(postId: string) {
     );
   } catch (error) {
     console.error("Error deleting post:", error);
+    throw error;
+  }
+}
+export async function updatePostAction(postId: string, data: Partial<DB_Post>) {
+  try {
+    const { databases } = await createAdminClient();
+    
+    // Очищаем данные от системных полей Appwrite
+    const updateData = Object.fromEntries(
+      Object.entries(data).filter(([key]) => !key.startsWith('$'))
+    );
+
+    const response = await databases.updateDocument(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.collections.timeline,
+      postId,
+      updateData
+    );
+
+    return JSON.parse(JSON.stringify(response)) as DB_Post;
+  } catch (error) {
+    console.error("Error updating post:", error);
     throw error;
   }
 }

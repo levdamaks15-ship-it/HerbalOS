@@ -25,7 +25,7 @@ const setupBotUI = async () => {
       menu_button: {
         type: "web_app",
         text: "Открыть Hub 🌿",
-        web_app: { url: "https://herbalife-os.vercel.app/vadim" }
+        web_app: { url: "https://herbalife-os.vercel.app/expert" }
       }
     });
     console.log("Bot UI successfully configured");
@@ -48,8 +48,8 @@ bot.command("start", async (ctx) => {
 
   if (isExpert) {
     const adminKeyboard = new InlineKeyboard()
-      .url("Открыть CRM", "https://herbalife-os.vercel.app/vadim/admin").row()
-      .url("Лента Media Hub", "https://herbalife-os.vercel.app/vadim/media");
+      .url("Открыть CRM", "https://herbalife-os.vercel.app/expert/admin").row()
+      .url("Лента Media Hub", "https://herbalife-os.vercel.app/expert/media");
 
     return ctx.reply(`
 💪 *Добро пожаловать, Наставник!*
@@ -70,7 +70,7 @@ bot.command("start", async (ctx) => {
     
     const clientKeyboard = new InlineKeyboard()
       .url("🎁 Забрать мой подарок", "https://example.com/meal-plan.pdf").row()
-      .webApp("Открыть мой Hub 🌿", "https://herbalife-os.vercel.app/vadim/dashboard");
+      .webApp("Открыть мой Hub 🌿", "https://herbalife-os.vercel.app/expert/dashboard");
 
     const result = await updateClientAction(clientId, { telegram_chat_id: chatId });
     
@@ -98,7 +98,7 @@ bot.command("start", async (ctx) => {
 
 // Быстрые ссылки
 bot.command("hub", (ctx) => {
-  const keyboard = new InlineKeyboard().webApp("Запустить Hub 🌿", "https://herbalife-os.vercel.app/vadim");
+  const keyboard = new InlineKeyboard().webApp("Запустить Hub 🌿", "https://herbalife-os.vercel.app/expert");
   return ctx.reply("Нажми кнопку ниже, чтобы открыть платформу прямо здесь, в Telegram:", { reply_markup: keyboard });
 });
 

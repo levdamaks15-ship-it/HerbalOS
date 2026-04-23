@@ -16,8 +16,7 @@ import {
   Link as LinkIcon, 
   Image as ImageIcon,
   Undo,
-  Redo,
-  Type
+  Redo
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +54,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Начнит�
         class: "prose prose-sm sm:prose lg:prose-lg focus:outline-none max-w-none min-h-[200px] font-medium text-graphite/80",
       },
     },
+    immediatelyRender: false,
   });
 
   if (!editor) return null;
@@ -88,7 +88,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Начнит�
           icon={<Italic size={18} />}
           title="Курсив"
         />
-        <div className="w-[1px] h-6 bg-graphite/10 mx-1" />
+        <div className="w-px h-6 bg-graphite/10 mx-1" />
         <ToolbarButton 
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} 
           active={editor.isActive("heading", { level: 1 })}
@@ -101,7 +101,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Начнит�
           icon={<Heading2 size={18} />}
           title="Заголовок 2"
         />
-        <div className="w-[1px] h-6 bg-graphite/10 mx-1" />
+        <div className="w-px h-6 bg-graphite/10 mx-1" />
         <ToolbarButton 
           onClick={() => editor.chain().focus().toggleBulletList().run()} 
           active={editor.isActive("bulletList")}
@@ -120,7 +120,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Начнит�
           icon={<Quote size={18} />}
           title="Цитата"
         />
-        <div className="w-[1px] h-6 bg-graphite/10 mx-1" />
+        <div className="w-px h-6 bg-graphite/10 mx-1" />
         <ToolbarButton 
           onClick={addLink} 
           active={editor.isActive("link")}

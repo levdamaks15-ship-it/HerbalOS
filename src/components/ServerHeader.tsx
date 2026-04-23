@@ -44,7 +44,7 @@ export async function ServerHeader({
               </Button>
             ) : (
               <Button asChild className="rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase h-10 px-3 sm:px-5 shadow-lg shadow-primary/20">
-                <Link href={`/${slug}/admin`}>Админ-панель</Link>
+                <Link href={`/${slug}/admin`}>Кабинет</Link>
               </Button>
             )}
 

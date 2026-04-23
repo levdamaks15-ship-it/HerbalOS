@@ -16,7 +16,7 @@ export async function getCurrentUserAction() {
     const user = await account.get();
     
     console.log("DEBUG: getCurrentUserAction - user found:", user.name);
-    return user;
+    return JSON.parse(JSON.stringify(user));
   } catch (error) {
     const err = error as Error;
     console.log("DEBUG: getCurrentUserAction - error:", err.message);

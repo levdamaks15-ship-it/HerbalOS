@@ -10,44 +10,60 @@ import {
   Loader2,
   AlertCircle,
   Plus,
-  Trash2,
+  Edit3,
   ChevronRight,
   TrendingDown,
   Layout
 } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { RichTextEditor } from "./RichTextEditor";
 import { storageService } from "@/lib/appwrite/services/storage";
-import { submitStoryAction, DB_Post } from "@/lib/actions/posts";
+import { submitStoryAction, updatePostAction, DB_Post } from "@/lib/actions/posts";
 import { useParams } from "next/navigation";
 
 interface PostModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialData?: DB_Post;
 }
 
-export function PostModal({ isOpen, onClose, onSuccess }: PostModalProps) {
+export function PostModal({ isOpen, onClose, onSuccess, initialData }: PostModalProps) {
   const { slug } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    title: "",
-    category: "Питание",
-    type: "standard" as "standard" | "result",
-    content: "",
-    excerpt: "",
-    image: "",
-    imageBefore: "",
-    imageAfter: "",
-    stats_weight: "",
-    stats_waist: "",
-    author: "Эксперт Гербалайф",
+    title: initialData?.title || "",
+    category: initialData?.category || "Питание",
+    type: (initialData?.type as "standard" | "result") || "standard",
+    content: initialData?.content || "",
+    excerpt: initialData?.excerpt || "",
+    image: initialData?.image || "",
+    imageBefore: initialData?.imageBefore || "",
+    imageAfter: initialData?.imageAfter || "",
+    stats_weight: initialData?.stats_weight || "",
+    stats_waist: initialData?.stats_waist || "",
+    author: initialData?.author || "Эксперт Гербалайф",
   });
 
-  const [previews, setPreviews] = useState<{ [key: string]: string }>({});
+  const [previews, setPreviews] = useState<{ [key: string]: string }>(() => {
+    if (!initialData) return {};
+    const initialPreviews: { [key: string]: string } = {};
+    ["image", "imageBefore", "imageAfter"].forEach(key => {
+      const val = initialData[key as keyof DB_Post];
+      if (val && typeof val === 'string') {
+        initialPreviews[key] = val.startsWith("http") || val.startsWith("/") 
+          ? val 
+          : storageService.getFilePreview(val);
+      }
+    });
+    return initialPreviews;
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+
   const beforeInputRef = useRef<HTMLInputElement>(null);
   const afterInputRef = useRef<HTMLInputElement>(null);
 
@@ -83,11 +99,22 @@ export function PostModal({ isOpen, onClose, onSuccess }: PostModalProps) {
 
     setIsLoading(true);
     try {
-      await submitStoryAction({
-        ...formData,
-        expert: slug as string,
-        status: "published"
-      } as any);
+      if (initialData) {
+        await updatePostAction(initialData.$id, {
+          ...formData,
+          expert: slug as string,
+        });
+      } else {
+        await submitStoryAction({
+          ...formData,
+          expert: slug as string,
+          status: "published",
+          isPremium: false,
+          date: "Сегодня",
+          likes: 0,
+          comments: 0
+        });
+      }
       onSuccess();
       onClose();
       // Reset
@@ -106,9 +133,10 @@ export function PostModal({ isOpen, onClose, onSuccess }: PostModalProps) {
       });
       setPreviews({});
       setStep(1);
-    } catch (error: any) {
-      console.error("Submit failed", error);
-      alert("Ошибка при сохранении поста: " + (error?.message || "Неизвестная ошибка"));
+    } catch (error) {
+      const err = error as Error;
+      console.error("Submit failed", err);
+      alert("Ошибка при сохранении поста: " + (err.message || "Неизвестная ошибка"));
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +146,7 @@ export function PostModal({ isOpen, onClose, onSuccess }: PostModalProps) {
     <AnimatePresence>
       {isOpen && (
         <>
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 md:p-10">
           <motion.div 
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
@@ -136,12 +164,19 @@ export function PostModal({ isOpen, onClose, onSuccess }: PostModalProps) {
           {/* Header */}
           <div className="p-8 border-b border-graphite/5 flex items-center justify-between shrink-0 bg-white/80 backdrop-blur-md z-10 sticky top-0">
              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-                   <Plus size={24} />
+                <div className={cn(
+                  "w-12 h-12 rounded-2xl flex items-center justify-center transition-all",
+                  initialData ? "bg-amber-500/10 text-amber-600" : "bg-primary/10 text-primary"
+                )}>
+                   {initialData ? <Edit3 size={24} /> : <Plus size={24} />}
                 </div>
                 <div>
-                   <h2 className="text-2xl font-black uppercase tracking-tight">Новая <span className="text-primary italic">публикация</span></h2>
-                   <p className="text-[10px] font-black text-graphite/30 uppercase">Шаг {step} из 2 • {formData.type === 'result' ? 'Результат клиента' : 'Обычный пост'}</p>
+                   <h2 className="text-2xl font-black uppercase tracking-tight">
+                    {initialData ? "Редактирование" : "Новая"} <span className={cn("italic", initialData ? "text-amber-600" : "text-primary")}>{initialData ? "публикации" : "публикация"}</span>
+                   </h2>
+                   <p className="text-[10px] font-black text-graphite/30 uppercase">
+                    {initialData ? "Изменение существующего контента" : `Шаг ${step} из 2 • ${formData.type === 'result' ? 'Результат клиента' : 'Обычный пост'}`}
+                   </p>
                 </div>
              </div>
              <button onClick={onClose} className="w-12 h-12 rounded-full bg-graphite/5 flex items-center justify-center text-graphite/40 hover:bg-red-50 hover:text-red-500 transition-all">
@@ -184,37 +219,37 @@ export function PostModal({ isOpen, onClose, onSuccess }: PostModalProps) {
                   {/* Post Type Selector */}
                   <div className="space-y-4">
                      <label className="text-[10px] font-black uppercase text-graphite/30 ml-2">Тип контента</label>
-                     <div className="grid grid-cols-2 gap-4">
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <button 
-                          onClick={() => setFormData(v => ({ ...v, type: "standard" }))}
-                          className={cn(
-                            "p-6 rounded-[32px] border-2 transition-all text-left flex items-center gap-4 group",
-                            formData.type === "standard" ? "border-primary bg-primary/5" : "border-graphite/5 hover:border-primary/30"
-                          )}
-                        >
-                           <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-all", formData.type === "standard" ? "bg-primary text-white" : "bg-graphite/5 text-graphite/40 group-hover:bg-primary/10 group-hover:text-primary")}>
-                              <Layout size={24} />
-                           </div>
-                           <div>
-                              <div className="font-black text-sm uppercase">Стандартный пост</div>
-                              <div className="text-[10px] font-bold text-graphite/30 uppercase">Статья, рецепт, совет</div>
-                           </div>
-                        </button>
+                           onClick={() => setFormData(v => ({ ...v, type: "standard" }))}
+                           className={cn(
+                             "p-8 rounded-[40px] border-2 transition-all flex flex-col items-center text-center gap-4 group relative overflow-hidden",
+                             formData.type === "standard" ? "border-primary bg-primary/5" : "border-graphite/5 hover:border-primary/10"
+                           )}
+                         >
+                            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-all", formData.type === "standard" ? "bg-primary text-white" : "bg-graphite/5 text-graphite/40 group-hover:bg-primary/10 group-hover:text-primary")}>
+                               <Layout size={28} />
+                            </div>
+                            <div className="space-y-1">
+                               <div className="font-black text-sm uppercase tracking-tight">Стандартный пост</div>
+                               <div className="text-[10px] font-bold text-graphite/40 uppercase tracking-wide leading-tight">Статья, рецепт, совет эксперта</div>
+                            </div>
+                         </button>
                         <button 
-                          onClick={() => setFormData(v => ({ ...v, type: "result" }))}
-                          className={cn(
-                            "p-6 rounded-[32px] border-2 transition-all text-left flex items-center gap-4 group",
-                            formData.type === "result" ? "border-primary bg-primary/5" : "border-graphite/5 hover:border-primary/30"
-                          )}
-                        >
-                           <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-all", formData.type === "result" ? "bg-primary text-white" : "bg-graphite/5 text-graphite/40 group-hover:bg-primary/10 group-hover:text-primary")}>
-                              <TrendingDown size={24} />
-                           </div>
-                           <div>
-                              <div className="font-black text-sm uppercase">Результат клиента</div>
-                              <div className="text-[10px] font-bold text-graphite/30 uppercase">История успеха до/после</div>
-                           </div>
-                        </button>
+                           onClick={() => setFormData(v => ({ ...v, type: "result" }))}
+                           className={cn(
+                             "p-8 rounded-[40px] border-2 transition-all flex flex-col items-center text-center gap-4 group relative overflow-hidden",
+                             formData.type === "result" ? "border-primary bg-primary/5" : "border-graphite/5 hover:border-primary/10"
+                           )}
+                         >
+                            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-all", formData.type === "result" ? "bg-primary text-white" : "bg-graphite/5 text-graphite/40 group-hover:bg-primary/10 group-hover:text-primary")}>
+                               <TrendingDown size={28} />
+                            </div>
+                            <div className="space-y-1">
+                               <div className="font-black text-sm uppercase tracking-tight">Результат клиента</div>
+                               <div className="text-[10px] font-bold text-graphite/40 uppercase tracking-wide leading-tight">История успеха и трансформация</div>
+                            </div>
+                         </button>
                      </div>
                   </div>
 
@@ -230,7 +265,13 @@ export function PostModal({ isOpen, onClose, onSuccess }: PostModalProps) {
                      >
                         {previews.image ? (
                            <>
-                              <img src={previews.image} className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105 duration-700" alt="Cover" />
+                              <Image 
+                                src={previews.image} 
+                                fill
+                                className="absolute inset-0 object-cover transition-transform group-hover:scale-105 duration-700" 
+                                alt="Cover" 
+                                unoptimized
+                              />
                               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                  <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white">
                                     <Upload size={24} />
@@ -259,9 +300,13 @@ export function PostModal({ isOpen, onClose, onSuccess }: PostModalProps) {
                           <label className="text-[10px] font-black uppercase text-graphite/30 ml-2">Фото ДО</label>
                           <div 
                              onClick={() => beforeInputRef.current?.click()}
-                             className="h-48 rounded-3xl border-2 border-dashed border-graphite/10 flex items-center justify-center cursor-pointer hover:bg-graphite/2 transition-all overflow-hidden"
+                             className="h-48 rounded-3xl border-2 border-dashed border-graphite/10 flex items-center justify-center cursor-pointer hover:bg-graphite/2 transition-all overflow-hidden relative"
                           >
-                             {previews.imageBefore ? <img src={previews.imageBefore} className="w-full h-full object-cover" /> : <Plus className="text-graphite/20" />}
+                             {previews.imageBefore ? (
+                               <Image src={previews.imageBefore} fill className="object-cover" alt="Before progress" unoptimized />
+                             ) : (
+                               <Plus className="text-graphite/20" />
+                             )}
                              <input ref={beforeInputRef} type="file" className="hidden" onChange={e => handleFileChange(e, 'imageBefore')} />
                           </div>
                        </div>
@@ -269,9 +314,13 @@ export function PostModal({ isOpen, onClose, onSuccess }: PostModalProps) {
                           <label className="text-[10px] font-black uppercase text-graphite/30 ml-2">Фото ПОСЛЕ</label>
                           <div 
                              onClick={() => afterInputRef.current?.click()}
-                             className="h-48 rounded-3xl border-2 border-dashed border-graphite/10 flex items-center justify-center cursor-pointer hover:bg-graphite/2 transition-all overflow-hidden"
+                             className="h-48 rounded-3xl border-2 border-dashed border-graphite/10 flex items-center justify-center cursor-pointer hover:bg-graphite/2 transition-all overflow-hidden relative"
                           >
-                             {previews.imageAfter ? <img src={previews.imageAfter} className="w-full h-full object-cover" /> : <Plus className="text-graphite/20" />}
+                             {previews.imageAfter ? (
+                               <Image src={previews.imageAfter} fill className="object-cover" alt="After progress" unoptimized />
+                             ) : (
+                               <Plus className="text-graphite/20" />
+                             )}
                              <input ref={afterInputRef} type="file" className="hidden" onChange={e => handleFileChange(e, 'imageAfter')} />
                           </div>
                        </div>
@@ -340,14 +389,19 @@ export function PostModal({ isOpen, onClose, onSuccess }: PostModalProps) {
                    >
                       Назад
                    </Button>
-                   <Button 
-                     onClick={handleSubmit}
-                     disabled={isLoading || !formData.content}
-                     className="h-16 px-12 rounded-3xl font-black gap-3 text-md shadow-xl shadow-primary/20 bg-primary hover:bg-primary-dark"
-                   >
-                      {isLoading ? <Loader2 className="animate-spin" /> : <CheckCircle2 size={20} />}
-                      {isLoading ? "Публикация..." : "Опубликовать"}
-                   </Button>
+                    <Button 
+                      onClick={handleSubmit}
+                      disabled={isLoading || !formData.content}
+                      className={cn(
+                        "h-16 px-12 rounded-3xl font-black gap-3 text-md shadow-xl transition-all",
+                        initialData 
+                          ? "bg-amber-600 hover:bg-amber-700 shadow-amber-600/20" 
+                          : "bg-primary hover:bg-primary-dark shadow-primary/20"
+                      )}
+                    >
+                       {isLoading ? <Loader2 className="animate-spin" /> : <CheckCircle2 size={20} />}
+                       {isLoading ? (initialData ? "Сохранение..." : "Публикация...") : (initialData ? "Сохранить изменения" : "Опубликовать")}
+                    </Button>
                 </>
              )}
           </div>

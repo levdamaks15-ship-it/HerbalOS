@@ -36,8 +36,9 @@ export async function onQuizCompleteAction(formData: QuizResults, slug: string) 
         );
         userId = newUser.$id;
         console.log("👤 Appwrite User created:", userId);
-      } catch (userError: any) {
-        console.error("⚠️ Failed to create user (might already exist):", userError.message);
+      } catch (userError) {
+        const err = userError as Error;
+        console.error("⚠️ Failed to create user (might already exist):", err.message);
         // Если пользователь уже есть, мы всё равно сохраним анкету
       }
     }
@@ -60,9 +61,10 @@ export async function onQuizCompleteAction(formData: QuizResults, slug: string) 
       }
     );
     console.log("✅ Quiz saved successfully to Appwrite with userId:", userId);
-  } catch (error: any) {
-    console.error("❌ Appwrite Error:", error.message);
-    return { success: false, error: error.message };
+  } catch (error) {
+    const err = error as Error;
+    console.error("❌ Appwrite Error:", err.message);
+    return { success: false, error: err.message };
   }
   
   // Отправляем уведомление в Telegram
