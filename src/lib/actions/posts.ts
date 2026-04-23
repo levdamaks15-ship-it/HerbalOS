@@ -52,7 +52,7 @@ export async function getPosts(expertSlug: string, includePending = false) {
   }
 }
  
-export async function submitStoryAction(data: Omit<DB_Post, "$id" | "likes" | "comments" | "date"> & { status?: DB_Post["status"] }) {
+export async function submitStoryAction(data: Omit<DB_Post, "$id" | "likes" | "comments" | "date" | "status"> & { status?: DB_Post["status"] }) {
   try {
     const { databases } = await createAdminClient();
     const response = await databases.createDocument(
