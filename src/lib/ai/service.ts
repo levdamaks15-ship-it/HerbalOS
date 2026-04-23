@@ -3,21 +3,10 @@ export const aiService = {
     const key = context.apiKey?.trim();
     if (!key) return "Ошибка: API ключ не найден.";
 
-    const prompt = `
-Ты — умный и дружелюбный ассистент эксперта по здоровому образу жизни и питанию (Гербалайф).
-Твоя цель: помогать клиентам эксперта ${context.expertName}, отвечать на вопросы о питании, продуктах и мотивации.
-
-Правила общения:
-1. Будь вежливым, позитивным и вдохновляющим.
-2. Используй эмодзи (🌿, 💪, 🥗, ✨).
-3. Если тебя спрашивают о продуктах Гербалайф, отвечай профессионально, подчеркивая их пользу для сбалансированного питания.
-4. Если клиент жалуется на плохое самочувствие или задает очень сложный медицинский вопрос — вежливо посоветуй обратиться к наставнику ${context.expertName} или врачу.
-5. Не выдумывай факты. Если чего-то не знаешь — предложи подождать ответа наставника.
-6. Отвечай кратко и по делу (не более 2-3 абзацев).
-
-Имя клиента: ${context.clientName || "Гость"}
-Вопрос клиента: ${userMessage}
-`;
+    const prompt = `Ты — ассистент эксперта Гербалайф ${context.expertName}. 
+Твоя цель: кратко и позитивно отвечать клиенту (${context.clientName || "Гость"}).
+Используй эмодзи 🌿, 💪, 🥗. Если вопрос сложный — зови наставника.
+Вопрос: ${userMessage}`;
 
     async function fetchAI(modelName: string) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${key}`;
@@ -32,12 +21,11 @@ export const aiService = {
     }
 
     try {
-      // Используем проверенную модель из твоего списка
-      return await fetchAI("gemini-flash-latest");
+      // 2.0 Flash обычно быстрее
+      return await fetchAI("gemini-2.0-flash");
     } catch (e: any) {
       try {
-        // Запасной вариант тоже из списка
-        return await fetchAI("gemini-2.0-flash");
+        return await fetchAI("gemini-flash-latest");
       } catch (fallbackError: any) {
         return `⚠️ Ошибка: ${fallbackError.message}`;
       }

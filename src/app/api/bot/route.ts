@@ -179,7 +179,7 @@ bot.on("message:text", async (ctx) => {
     });
 
     const timeoutPromise = new Promise<string>((resolve) => 
-      setTimeout(() => resolve("TIMEOUT_REACHED"), 8500)
+      setTimeout(() => resolve("TIMEOUT_REACHED"), 9200)
     );
 
     const result = await Promise.race([aiPromise, timeoutPromise]);
