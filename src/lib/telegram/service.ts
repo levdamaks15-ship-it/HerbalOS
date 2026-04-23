@@ -154,5 +154,37 @@ ${message}
       console.error("Error sending personal reminder:", error);
       return { success: false, error };
     }
+  },
+
+  // Финальное резюме после квиза
+  async sendQuizCompletionSummary(chatId: string, expertSlug: string) {
+    if (!bot || !chatId) return;
+
+    const message = `
+🌿 *Поздравляю! Ваш Wellness-тест пройден!*
+
+Ваши данные успешно переданы наставнику. Мы уже начали готовить вашу персональную стратегию питания и оздоровления. 💪
+
+🚀 *Что делать дальше?*
+• Дождитесь звонка или сообщения от наставника в забронированное время.
+• Изучите **Media Hub** — там уже ждут полезные рецепты и советы.
+• Следите за уведомлениями здесь — я буду присылать важные напоминания.
+
+Рады видеть вас в нашей команде! ✨
+`;
+
+    const keyboard = [
+      [{ text: "📖 Открыть Media Hub", url: `${BASE_URL}/${expertSlug}/media` }],
+      [{ text: "📊 Мой кабинет", url: `${BASE_URL}/${expertSlug}/dashboard` }]
+    ];
+
+    try {
+      await bot.api.sendMessage(chatId, message, {
+        parse_mode: "Markdown",
+        reply_markup: { inline_keyboard: keyboard }
+      });
+    } catch (error) {
+      console.error("Error sending quiz completion summary:", error);
+    }
   }
 };

@@ -64,11 +64,16 @@ export async function onQuizCompleteAction(formData: QuizResults, slug: string) 
     );
     console.log("✅ Quiz saved successfully to Appwrite with userId:", userId);
     
-    // Отправляем уведомление в Telegram с ID клиента
+    // Отправляем уведомление в Telegram эксперту
     await telegramService.sendLeadNotification({
       ...formData,
       clientId: clientDoc.$id
     }, slug);
+
+    // НОВОЕ: Отправляем резюме самому пользователю в Telegram
+    if (formData.telegram_chat_id) {
+      await telegramService.sendQuizCompletionSummary(formData.telegram_chat_id, slug);
+    }
   } catch (error) {
     const err = error as Error;
     console.error("❌ Appwrite Error:", err.message);
