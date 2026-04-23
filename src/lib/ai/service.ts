@@ -32,12 +32,12 @@ export const aiService = {
     }
 
     try {
-      // Самая стабильная и быстрая версия 1.5 Flash
-      return await fetchAI("gemini-1.5-flash");
+      // Используем проверенную модель из твоего списка
+      return await fetchAI("gemini-flash-latest");
     } catch (e: any) {
       try {
-        // Запасной вариант с алиасом
-        return await fetchAI("gemini-1.5-flash-latest");
+        // Запасной вариант тоже из списка
+        return await fetchAI("gemini-2.0-flash");
       } catch (fallbackError: any) {
         return `⚠️ Ошибка: ${fallbackError.message}`;
       }
