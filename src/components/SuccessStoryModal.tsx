@@ -17,6 +17,7 @@ import {
 import { Button } from "./ui/button";
 import { DB_Post } from "@/lib/actions/posts";
 import { cn } from "@/lib/utils";
+import { storageService } from "@/lib/appwrite/services/storage";
 
 interface SuccessStoryModalProps {
   post: DB_Post | null;
@@ -47,6 +48,16 @@ const PRODUCT_DATA: Record<string, { icon: React.ReactNode, color: string, image
 
 export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: SuccessStoryModalProps) {
   if (!post) return null;
+
+  const getImageUrl = (id: string | undefined) => {
+    if (!id) return "/assets/placeholder.png";
+    if (id.startsWith("http") || id.startsWith("/")) return id;
+    try {
+      return storageService.getFilePreview(id);
+    } catch (e) {
+      return "/assets/placeholder.png";
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -92,14 +103,14 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                   {post.imageBefore === post.imageAfter ? (
                      <div className="relative h-full w-full overflow-hidden group">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={post.imageAfter} alt="Transformation" className="w-full h-full object-cover transform transition-transform duration-[2s] group-hover:scale-105" />
+                        <img src={getImageUrl(post.imageAfter)} alt="Transformation" className="w-full h-full object-cover transform transition-transform duration-[2s] group-hover:scale-105" />
                         <div className="absolute inset-0 bg-linear-to-t from-graphite via-transparent to-graphite/20 opacity-60" />
                      </div>
                   ) : (
                      <div className="absolute inset-0 grid grid-cols-2 gap-px bg-white/5">
                         <div className="relative overflow-hidden group">
                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                           <img src={post.imageBefore} alt="Before" className="w-full h-full object-cover object-center transform transition-transform duration-1000 group-hover:scale-105" />
+                           <img src={getImageUrl(post.imageBefore)} alt="Before" className="w-full h-full object-cover object-center transform transition-transform duration-1000 group-hover:scale-105" />
                            <div className="absolute top-1/2 left-8 -translate-y-1/2 flex flex-col items-center gap-4">
                               <div className="w-px h-24 bg-linear-to-b from-transparent via-white/50 to-transparent" />
                               <div className="bg-black/60 backdrop-blur-md text-white px-6 py-2 rounded-2xl text-[12px] font-black uppercase border border-white/10 tracking-widest">До</div>
@@ -108,7 +119,7 @@ export function SuccessStoryModal({ post, isOpen, onClose, expertSlug }: Success
                         </div>
                         <div className="relative overflow-hidden group">
                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                           <img src={post.imageAfter} alt="After" className="w-full h-full object-cover object-center transform transition-transform duration-1000 group-hover:scale-105" />
+                           <img src={getImageUrl(post.imageAfter)} alt="After" className="w-full h-full object-cover object-center transform transition-transform duration-1000 group-hover:scale-105" />
                            <div className="absolute top-1/2 right-8 -translate-y-1/2 flex flex-col items-center gap-4">
                               <div className="w-px h-24 bg-linear-to-b from-transparent via-primary/50 to-transparent" />
                               <div className="bg-primary text-white px-6 py-2 rounded-2xl text-[12px] font-black uppercase shadow-xl tracking-widest">После</div>

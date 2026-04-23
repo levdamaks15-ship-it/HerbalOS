@@ -15,6 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { getPosts, DB_Post } from "@/lib/actions/posts";
 import { SuccessStoryModal } from "@/components/SuccessStoryModal";
+import { storageService } from "@/lib/appwrite/services/storage";
 
 const FALLBACK_POSTS: Partial<DB_Post>[] = [
   {
@@ -61,6 +62,16 @@ export default function MediaPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState<DB_Post | null>(null);
   const expertName = "Эксперт Гербалайф";
+
+  const getImageUrl = (id: string | undefined) => {
+    if (!id) return "/assets/placeholder.png";
+    if (id.startsWith("http") || id.startsWith("/")) return id;
+    try {
+      return storageService.getFilePreview(id);
+    } catch (e) {
+      return "/assets/placeholder.png";
+    }
+  };
 
   useEffect(() => {
     async function loadPosts() {
@@ -156,19 +167,19 @@ export default function MediaPage() {
                                  {post.imageBefore === post.imageAfter ? (
                                     <div className="relative h-full w-full">
                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                       <img src={post.imageAfter} alt="Transformation" className="w-full h-full object-cover" />
+                                       <img src={getImageUrl(post.imageAfter)} alt="Transformation" className="w-full h-full object-cover" />
                                        <div className="absolute inset-0 bg-linear-to-t from-graphite via-transparent to-transparent opacity-60" />
                                     </div>
                                  ) : (
                                     <div className="grid grid-cols-2 h-full gap-px bg-white/10">
                                        <div className="relative overflow-hidden">
                                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                                          <img src={post.imageBefore} alt="Before" className="w-full h-full object-cover object-center" />
+                                          <img src={getImageUrl(post.imageBefore)} alt="Before" className="w-full h-full object-cover object-center" />
                                           <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-md text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase border border-white/10">До</div>
                                        </div>
                                        <div className="relative overflow-hidden">
                                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                                          <img src={post.imageAfter} alt="After" className="w-full h-full object-cover object-center" />
+                                          <img src={getImageUrl(post.imageAfter)} alt="After" className="w-full h-full object-cover object-center" />
                                           <div className="absolute top-6 right-6 bg-primary text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase shadow-lg">После</div>
                                        </div>
                                     </div>
@@ -205,7 +216,7 @@ export default function MediaPage() {
                         <CardContent className="p-0 space-y-6">
                            <div className="relative rounded-[40px] overflow-hidden aspect-16/10 shadow-2xl">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={post.image} alt={post.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                              <img src={getImageUrl(post.image)} alt={post.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
                                <div className="absolute top-8 left-8 flex gap-3">
                                   <span className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-tight text-graphite shadow-sm">{post.category}</span>
                                   {post.isPremium && (
