@@ -17,7 +17,7 @@ export const storageService = {
     },
 
     getFilePreview(fileId: string) {
-        return storage.getFilePreview(
+        return storage.getFileView(
             APPWRITE_CONFIG.buckets.photos,
             fileId
         ).toString();
