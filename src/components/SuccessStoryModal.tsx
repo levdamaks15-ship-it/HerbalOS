@@ -4,18 +4,15 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   X, 
-  ArrowRight, 
   Sparkles, 
   TrendingDown, 
   Target,
   ArrowLeft,
   Droplets,
   Leaf,
-  Flame,
-  ChevronRight
+  Flame
 } from "lucide-react";
 import Image from "next/image";
-import { Button } from "./ui/button";
 import { DB_Post } from "@/lib/actions/posts";
 import { cn } from "@/lib/utils";
 import { storageService } from "@/lib/appwrite/services/storage";

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/AuthProvider";
 
 interface HubCardProps {
   title: string;
@@ -118,9 +119,14 @@ const HubCard = ({
 };
 
 export function EcosystemHub({ slug }: { slug: string }) {
+  const { user, clientProfile } = useAuth();
+  
+  const isExpert = user && !clientProfile;
+  const isGuest = !user;
+
   return (
     <div className="flex flex-col gap-6 px-6 mb-12">
-      {/* Media Hub */}
+      {/* Media Hub - Виден всем */}
       <HubCard 
         title="Медиа-канал эксперта"
         description="Эксклюзивная лента контента, профессиональные статьи и реальные истории трансформации ваших тел под моим руководством."
@@ -129,24 +135,28 @@ export function EcosystemHub({ slug }: { slug: string }) {
         badge="Свежее"
       />
 
-      {/* Wellness-тест */}
-      <HubCard 
-        title="Wellness-тест"
-        description="Пройдите профессиональное тестирование: расчет ИМТ и персональный анализ ключевых параметров вашего тела за 2 минуты."
-        icon={Target}
-        href={`/${slug}/quiz`}
-        badge="Бесплатно"
-        variant="primary"
-      />
+      {/* Wellness-тест - Виден ТОЛЬКО гостям */}
+      {isGuest && (
+        <HubCard 
+          title="Wellness-тест"
+          description="Пройдите профессиональное тестирование: расчет ИМТ и персональный анализ ключевых параметров вашего тела за 2 минуты."
+          icon={Target}
+          href={`/${slug}/quiz`}
+          badge="Бесплатно"
+          variant="primary"
+        />
+      )}
 
-      {/* Library/Knowledge Base */}
-      <HubCard 
-        title="Библиотека эксперта"
-        description="Более 50 эксклюзивных видео-уроков, авторских гайдов по питанию и архива рецептов для быстрого достижения результата."
-        icon={BookOpen}
-        href="#"
-        badge="Обучение"
-      />
+      {/* Library/Knowledge Base - Виден ТОЛЬКО эксперту */}
+      {isExpert && (
+        <HubCard 
+          title="Библиотека эксперта"
+          description="Более 50 эксклюзивных видео-уроков, авторских гайдов по питанию и архива рецептов для быстрого достижения результата."
+          icon={BookOpen}
+          href="#"
+          badge="Обучение"
+        />
+      )}
     </div>
   );
 }
