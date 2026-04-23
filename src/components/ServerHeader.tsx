@@ -48,7 +48,7 @@ export async function ServerHeader({
               </Button>
             )}
 
-            <LogoutButton slug={slug} />
+            <LogoutButton />
           </>
         ) : (
           <>

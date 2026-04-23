@@ -6,6 +6,7 @@ import { Query } from "node-appwrite";
  
 export interface DB_Post {
   $id: string;
+  $createdAt: string;
   category: string;
   title: string;
   excerpt: string;
@@ -52,7 +53,7 @@ export async function getPosts(expertSlug: string, includePending = false) {
   }
 }
  
-export async function submitStoryAction(data: Omit<DB_Post, "$id" | "likes" | "comments" | "date" | "status"> & { status?: DB_Post["status"] }) {
+export async function submitStoryAction(data: Omit<DB_Post, "$id" | "likes" | "comments" | "date" | "status" | "$createdAt"> & { status?: DB_Post["status"] }) {
   try {
     const { databases } = await createAdminClient();
     const response = await databases.createDocument(

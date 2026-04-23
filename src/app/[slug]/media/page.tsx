@@ -282,7 +282,6 @@ export default function MediaPage() {
         isOpen={!!selectedPost}
         post={selectedPost}
         onClose={() => setSelectedPost(null)}
-        expertSlug={slug as string}
       />
     </div>
   );

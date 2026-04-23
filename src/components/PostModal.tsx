@@ -109,10 +109,7 @@ export function PostModal({ isOpen, onClose, onSuccess, initialData }: PostModal
           ...formData,
           expert: slug as string,
           status: "published",
-          isPremium: false,
-          date: "Сегодня",
-          likes: 0,
-          comments: 0
+          isPremium: false
         });
       }
       onSuccess();
